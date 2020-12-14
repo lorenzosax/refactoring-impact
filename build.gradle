@@ -13,4 +13,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     // https://mvnrepository.com/artifact/com.github.tsantalis/refactoring-miner
     compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0.2'
+    // https://mvnrepository.com/artifact/org.buildobjects/jproc
+    compile group: 'org.buildobjects', name: 'jproc', version: '2.3.0'
 }
