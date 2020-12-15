@@ -36,7 +36,9 @@ public class RefactoringMinerWorker {
         miner.detectAll(repo, branch, new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<Refactoring> refactorings) {
-                commitArrayList.add(new Commit(commitId, refactorings));
+                if (refactorings.size() > 0) {
+                    commitArrayList.add(new Commit(commitId, refactorings));
+                }
             }
         });
         return commitArrayList;
