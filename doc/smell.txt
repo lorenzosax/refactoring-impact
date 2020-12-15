@@ -1,0 +1,26 @@
+		GURU									REFACTORING_MINER
+SMELL:
+	--> refactoring type
+
+	rule
+
+--------------------------------------------------------------------------------------------------
+
+Long Method:
+	--> Extract Method							Extract Method
+		Replace Temp with Query					Split Variable / Split Parameter / Split Attribute
+		Introduce Parameter Object				...
+		Preserve Whole Object					...
+		Replace Method with Method Object		...
+		Decompose Conditional					...
+
+	rule: Extract Method OR Split Variable OR Split Parameter OR Split Attribute
+	(consideriamo il nome del metodo)
+
+Large Class:
+	--> Extract Class							Extract Class
+		Extract Subclass						Extract Subclass
+		Extract Interface						Extract Interface
+
+	rule: Extract Class OR Extract Subclass OR Extract Interface
+	(consideriamo il nome della classe)
