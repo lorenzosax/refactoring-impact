@@ -1,10 +1,27 @@
 		GURU									REFACTORING_MINER
-SMELL:
+SMELL
+DESIGNITE:
 	--> refactoring type
 
 	rule
 
 --------------------------------------------------------------------------------------------------
+
+Long Method (Complex Method)					Extract Method
+
+Long Parameter List								Merge Parameter, Remove Parameter
+
+Multifaceted Abstraction						Extract Class, Extract Subclass
+(corrisponde al God Class)
+
+
+
+
+
+
+
+
+
 
 Long Method:
 	--> Extract Method							Extract Method

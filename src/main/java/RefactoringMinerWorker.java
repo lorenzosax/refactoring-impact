@@ -44,10 +44,10 @@ public class RefactoringMinerWorker {
         return commitArrayList;
     }
 
-    public boolean checkoutPreviousCommit(String commitHashId) throws Exception {
+    public String checkoutPreviousCommit(String commitHashId) throws Exception {
 
         ProcResult result = new ProcBuilder("git")
-                .withWorkingDirectory(new File(repo.getDirectory().toString()))
+                .withWorkingDirectory(new File(repo.getDirectory().getParent()))
                 .withArg("rev-list")
                 .withArg("--parents")
                 .withArg("-n")
@@ -63,10 +63,22 @@ public class RefactoringMinerWorker {
             previousCommit = matcher.group(1);
             System.out.println("Checkout to commit id: " + previousCommit);
             gitService.checkout(repo, previousCommit);
-            return true;
+            return previousCommit;
         }
 
         System.out.println("Match not found");
-        return false;
+        return null;
+    }
+
+    public boolean checkoutToCommit(String commitHashId) throws Exception {
+        ProcResult procResult = new ProcBuilder("git")
+                .withWorkingDirectory(new File(repo.getDirectory().getParent()))
+                .withArg("checkout")
+                .withArg("-f")
+                .withArg(commitHashId)
+                .run();
+
+        System.out.println(procResult.getOutputString());
+        return true;
     }
 }
