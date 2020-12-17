@@ -15,4 +15,6 @@ dependencies {
     compile group: 'com.github.tsantalis', name: 'refactoring-miner', version: '2.0.2'
     // https://mvnrepository.com/artifact/org.buildobjects/jproc
     compile group: 'org.buildobjects', name: 'jproc', version: '2.3.0'
+    // https://mvnrepository.com/artifact/com.opencsv/opencsv
+    compile group: 'com.opencsv', name: 'opencsv', version: '5.3'
 }
