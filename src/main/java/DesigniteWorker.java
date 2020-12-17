@@ -19,7 +19,7 @@ public class DesigniteWorker {
     private static final String IMPLEMENTATION_CODE_SMELLS_FILENAME = "implementationCodeSmells.csv";
     private static final String FILTEREDSMELLS_FILENAME = "filteredSmells.csv";
 
-    static final Map<String, Boolean> ALLOWED_SMELL = new HashMap<>() {{
+    static final Map<String, Boolean> ALLOWED_SMELL = new HashMap<String, Boolean>() {{
        put("Long Method", true);
        put("Long Parameter List", true);
        put("Multifaceted Abstraction", true);
