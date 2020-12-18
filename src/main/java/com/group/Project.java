@@ -1,3 +1,10 @@
+package com.group;
+
+import com.group.csv.Smell;
+import com.group.pojo.Commit;
+import com.group.worker.DesigniteWorker;
+import com.group.worker.RefactoringMinerWorker;
+
 import java.util.*;
 
 public class Project {
@@ -9,6 +16,8 @@ public class Project {
         RefactoringMinerWorker refactoringMinerWorker = new RefactoringMinerWorker(repo);
         DesigniteWorker designiteWorker = new DesigniteWorker(designite, repo);
 
+        System.out.println("<Start process>");
+        System.out.println("-----------------------------------------");
         ArrayList<Commit> commitList = refactoringMinerWorker.getCommitListRefactoringAffected();
 
         for (Commit commit : commitList) {
@@ -36,7 +45,8 @@ public class Project {
                     }
                 }
             }
-            System.out.println("Process finished!");
+            System.out.println("-----------------------------------------");
         }
+        System.out.println("Process finished!");
     }
 }

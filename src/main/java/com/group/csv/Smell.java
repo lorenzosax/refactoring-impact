@@ -1,18 +1,22 @@
-import com.opencsv.bean.CsvBindByPosition;
+package com.group.csv;
+
+import com.opencsv.bean.CsvBindByName;
+import com.group.csv.annotation.CsvBindByNameOrder;
 
 import java.io.Serializable;
 
+@CsvBindByNameOrder({"Project","Package","Class","Method","Code Smell"})
 public class Smell implements Serializable {
-
-    @CsvBindByPosition(position = 0)
+    
+    @CsvBindByName(column = "Project")
     private String projectName;
-    @CsvBindByPosition(position = 1)
+    @CsvBindByName(column = "Package")
     private String packageName;
-    @CsvBindByPosition(position = 2)
+    @CsvBindByName(column = "Class")
     private String className;
-    @CsvBindByPosition(position = 3)
+    @CsvBindByName(column = "Method")
     private String methodName;
-    @CsvBindByPosition(position = 4)
+    @CsvBindByName(column = "Code Smell")
     private String codeSmell;
 
     public Smell(String projectName, String packageName, String className, String methodName, String codeSmell) {

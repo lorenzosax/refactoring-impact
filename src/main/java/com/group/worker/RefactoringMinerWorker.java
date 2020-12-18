@@ -1,3 +1,5 @@
+package com.group.worker;
+
 import org.buildobjects.process.ProcBuilder;
 import org.buildobjects.process.ProcResult;
 import org.eclipse.jgit.lib.Repository;
@@ -7,6 +9,7 @@ import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
+import com.group.pojo.Commit;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ public class RefactoringMinerWorker {
     }
 
     public ArrayList<Commit> getCommitListRefactoringAffected(String branch) throws Exception {
+        System.out.println("Run Refactoring Miner...");
         ArrayList<Commit> commitArrayList = new ArrayList<>();
         miner.detectAll(repo, branch, new RefactoringHandler() {
             @Override
@@ -41,10 +45,13 @@ public class RefactoringMinerWorker {
                 }
             }
         });
+        System.out.println("Refactoring Miner Done!");
         return commitArrayList;
     }
 
     public String checkoutPreviousCommit(String commitHashId) throws Exception {
+
+        System.out.println("Commit Hash: " + commitHashId);
 
         ProcResult result = new ProcBuilder("git")
                 .withWorkingDirectory(new File(repo.getDirectory().getParent()))
@@ -61,12 +68,12 @@ public class RefactoringMinerWorker {
 
         if(matcher.find()) {
             previousCommit = matcher.group(1);
-            System.out.println("Checkout to commit id: " + previousCommit);
             gitService.checkout(repo, previousCommit);
+            System.out.println("Checkout to previous commit hash: " + previousCommit);
             return previousCommit;
         }
 
-        System.out.println("Match not found");
+        System.out.println("Previous Commit hash not found: " + commitHashId);
         return null;
     }
 
@@ -78,7 +85,7 @@ public class RefactoringMinerWorker {
                 .withArg(commitHashId)
                 .run();
 
-        System.out.println(procResult.getOutputString());
+        System.out.println("Checkout to commit hash: " + commitHashId);
         return true;
     }
 }

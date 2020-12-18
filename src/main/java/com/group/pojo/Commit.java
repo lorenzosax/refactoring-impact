@@ -1,3 +1,5 @@
+package com.group.pojo;
+
 import org.refactoringminer.api.Refactoring;
 
 import java.util.List;
