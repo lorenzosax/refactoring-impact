@@ -50,7 +50,7 @@ public class RefactoringMinerWorker {
         return commitArrayList;
     }
 
-    public String checkoutPreviousCommit(String commitHashId) throws Exception {
+    public String checkoutPreviousCommit(String commitHashId) {
 
         System.out.println("Commit Hash: " + commitHashId);
 
@@ -69,8 +69,7 @@ public class RefactoringMinerWorker {
 
         if(matcher.find()) {
             previousCommit = matcher.group(1);
-            gitService.checkout(repo, previousCommit);
-            System.out.println("Checkout to previous commit hash: " + previousCommit);
+            checkoutToCommit(previousCommit);
             return previousCommit;
         }
 
