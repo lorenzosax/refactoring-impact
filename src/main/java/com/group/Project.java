@@ -43,24 +43,22 @@ public class Project {
                     InfoCommit infoCommit = refactoringMinerWorker.getInformationCommit(commitHashId);
                     List<Smell> smellListActualCommit = designiteWorker.execute(commitHashId);
 
-                    if (smellListActualCommit.size() > 0) {
-                        for (Smell s0 : smellListPreviousCommit) {
-                            ProcessResult pr = new ProcessResult();
-                            pr.setCommitHash(commitHashId);
-                            pr.setClassName(s0.getClassName());
-                            pr.setMethodName(s0.getMethodName());
-                            pr.setCommitterName(infoCommit.getAuthor());
-                            pr.setCommitterEmail(infoCommit.getEmail());
-                            pr.setSmellType(s0.getCodeSmell());
-                            if (smellListActualCommit.contains(s0)) {
-                                pr.setSmellRemoved(false);
-                            } else {
-                                pr.setSmellRemoved(true);
-                                // lo smell s0 è stato risolto: indagare quale refactoring di riferimento
-                                // sonarscanner
-                            }
-                            resultList.add(pr);
+                    for (Smell s0 : smellListPreviousCommit) {
+                        ProcessResult pr = new ProcessResult();
+                        pr.setCommitHash(commitHashId);
+                        pr.setClassName(s0.getClassName());
+                        pr.setMethodName(s0.getMethodName());
+                        pr.setCommitterName(infoCommit.getAuthor());
+                        pr.setCommitterEmail(infoCommit.getEmail());
+                        pr.setSmellType(s0.getCodeSmell());
+                        if (smellListActualCommit.contains(s0)) {
+                            pr.setSmellRemoved(false);
+                        } else {
+                            pr.setSmellRemoved(true);
+                            // lo smell s0 è stato risolto: indagare quale refactoring di riferimento
+                            // sonarscanner
                         }
+                        resultList.add(pr);
                     }
                 }
             }
