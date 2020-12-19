@@ -19,16 +19,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RefactoringMinerWorker {
+
     GitService gitService = new GitServiceImpl();
     GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
     Repository repo;
+    String resultsDir;
 
-    public RefactoringMinerWorker(String pathToRepo) throws Exception {
-        repo = gitService.openRepository(pathToRepo);
+    public RefactoringMinerWorker(String repoDir, String resultsDir) throws Exception {
+        repo = gitService.openRepository(repoDir);
+        this.resultsDir = resultsDir;
     }
 
-    public RefactoringMinerWorker(String pathToDirectory, String repoUrl) throws Exception {
+    public RefactoringMinerWorker(String pathToDirectory, String repoUrl, String resultsDir) throws Exception {
         repo = gitService.cloneIfNotExists(pathToDirectory, repoUrl);
+        this.resultsDir = resultsDir;
     }
 
     public ArrayList<Commit> getCommitListRefactoringAffected() throws Exception {

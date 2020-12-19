@@ -26,32 +26,31 @@ public class DesigniteWorker {
        put("Multifaceted Abstraction", true);
     }};
 
-    private String designitePath;
-    private String projectDir;
+    private String designiteDir;
+    private String repoDir;
+    private String resultsDir;
 
-    public DesigniteWorker(String designitePath, String projectDir){
-        this.designitePath = designitePath;
-        this.projectDir = projectDir;
+    public DesigniteWorker(String designiteDir, String repoDir, String resultsDir){
+        this.designiteDir = designiteDir;
+        this.repoDir = repoDir;
         new ProcBuilder("mkdir")
+                .withWorkingDirectory(new File(resultsDir))
                 .withArg(DESIGNITE_RESULTS_FOLDER);
-    }
-
-    private String getResultsPath() {
-        return designitePath + "\\" + DESIGNITE_RESULTS_FOLDER + "\\";
+        this.resultsDir = resultsDir + "\\" + DESIGNITE_RESULTS_FOLDER + "\\";
     }
 
     public List<Smell> execute(String folderName) {
 
         System.out.println("Run Designite...");
 
-        String outputPath = getResultsPath() + System.currentTimeMillis() + "_" + folderName + "\\";
+        String outputPath = this.resultsDir + System.currentTimeMillis() + "_" + folderName + "\\";
 
         new ProcBuilder("java")
-                .withWorkingDirectory(new File(designitePath))
+                .withWorkingDirectory(new File(designiteDir))
                 .withArg("-jar")
                 .withArg("DesigniteJava.jar")
                 .withArg("-i")
-                .withArg(projectDir)
+                .withArg(repoDir)
                 .withArg("-o")
                 .withArg(outputPath)
                 .run();

@@ -7,25 +7,31 @@ import com.group.pojo.InfoCommit;
 import com.group.pojo.ProcessResult;
 import com.group.worker.DesigniteWorker;
 import com.group.worker.RefactoringMinerWorker;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 import java.util.*;
 
-public class Project {
+public class Process {
+
+    static final String RESULTS_PROCESS_FILENAME = "datasets.csv";
 
     public static void main(String[] args) throws Exception {
 
-        String repo = "C:\\Users\\loren\\IdeaProjects\\minic";
-        String designiteDir = "C:\\Users\\loren\\IdeaProjects\\TOOL";
-        String sonarQubeServerBinDir = "C:\\Users\\loren\\IdeaProjects\\sonarqube-8.5.1.38104\\bin\\windows-x86-64";
-        String sonarQubeScannerBinDir = "C:\\Users\\loren\\IdeaProjects\\sonar-scanner-4.5.0.2216-windows\\bin";
+        Config conf = ConfigFactory.load();
+        String repoDir = conf.getString("repo.dir");
+        String designiteDir = conf.getString("designite.dir");
+        String sonarQubeServerBinDir = conf.getString("sonarqube.server.bin-dir");
+        String sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
+        String resultsDir = conf.getString("results.dir");
 
         List<ProcessResult> resultList = new ArrayList<>();
 
-        RefactoringMinerWorker refactoringMinerWorker = new RefactoringMinerWorker(repo);
-        DesigniteWorker designiteWorker = new DesigniteWorker(designiteDir, repo);
+        RefactoringMinerWorker refactoringMinerWorker = new RefactoringMinerWorker(repoDir, resultsDir);
+        DesigniteWorker designiteWorker = new DesigniteWorker(designiteDir, repoDir, resultsDir);
 
         System.out.println("<Start process>");
-        System.out.println("-----------------------------------------");
+
         ArrayList<Commit> commitList = refactoringMinerWorker.getCommitListRefactoringAffected();
 
         for (Commit commit : commitList) {
@@ -64,7 +70,8 @@ public class Project {
             }
             System.out.println("-----------------------------------------");
         }
-        CSVService.writeCsvFile("result.csv", resultList, ProcessResult.class);
+        System.out.println("Generating " + RESULTS_PROCESS_FILENAME);
+        CSVService.writeCsvFile(resultsDir + "\\" + RESULTS_PROCESS_FILENAME, resultList, ProcessResult.class);
         System.out.println("Process finished!");
     }
 }
