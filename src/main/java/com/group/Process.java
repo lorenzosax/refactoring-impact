@@ -18,16 +18,20 @@ public class Process {
 
     public static void main(String[] args) throws Exception {
 
+        // region Load Configurations
         Config conf = ConfigFactory.load();
         String repoDir = conf.getString("repo.dir");
         String designiteDir = conf.getString("designite.dir");
         String sonarQubeServerBinDir = conf.getString("sonarqube.server.bin-dir");
         String sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
+        boolean writeRefactoringMinerOutputOnFile = conf.getBoolean("results.refactoring-miner.write-on-file");
         String resultsDir = conf.getString("results.dir");
+        // endregion
 
         List<ProcessResult> resultList = new ArrayList<>();
 
-        RefactoringMinerWorker refactoringMinerWorker = new RefactoringMinerWorker(repoDir, resultsDir);
+        RefactoringMinerWorker refactoringMinerWorker =
+                new RefactoringMinerWorker(repoDir, resultsDir, writeRefactoringMinerOutputOnFile);
         DesigniteWorker designiteWorker = new DesigniteWorker(designiteDir, repoDir, resultsDir);
 
         System.out.println("<Start process>");

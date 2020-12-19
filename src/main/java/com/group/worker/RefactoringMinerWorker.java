@@ -1,5 +1,7 @@
 package com.group.worker;
 
+import com.group.csv.CSVService;
+import com.group.csv.RefactoringCSV;
 import com.group.pojo.InfoCommit;
 import org.buildobjects.process.ProcBuilder;
 import org.buildobjects.process.ProcResult;
@@ -20,19 +22,24 @@ import java.util.regex.Pattern;
 
 public class RefactoringMinerWorker {
 
-    GitService gitService = new GitServiceImpl();
-    GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
-    Repository repo;
-    String resultsDir;
+    private static final String REFACTORING_TYPE_FOUND_FILENAME = "refactoringFound.csv";
 
-    public RefactoringMinerWorker(String repoDir, String resultsDir) throws Exception {
+    private GitService gitService = new GitServiceImpl();
+    private GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+    private Repository repo;
+    private String resultsDir;
+    private boolean writeOutputOnFile;
+
+    public RefactoringMinerWorker(String repoDir, String resultsDir, boolean writeOutputOnFile) throws Exception {
         repo = gitService.openRepository(repoDir);
         this.resultsDir = resultsDir;
+        this.writeOutputOnFile = writeOutputOnFile;
     }
 
-    public RefactoringMinerWorker(String pathToDirectory, String repoUrl, String resultsDir) throws Exception {
+    public RefactoringMinerWorker(String pathToDirectory, String repoUrl, String resultsDir, boolean writeOutputOnFile) throws Exception {
         repo = gitService.cloneIfNotExists(pathToDirectory, repoUrl);
         this.resultsDir = resultsDir;
+        this.writeOutputOnFile = writeOutputOnFile;
     }
 
     public ArrayList<Commit> getCommitListRefactoringAffected() throws Exception {
@@ -51,6 +58,9 @@ public class RefactoringMinerWorker {
             }
         });
         System.out.println("Refactoring Miner Done!");
+        if (this.writeOutputOnFile) {
+            parseCommitArrayListAndWriteOnFile(commitArrayList);
+        }
         return commitArrayList;
     }
 
@@ -114,5 +124,25 @@ public class RefactoringMinerWorker {
         }
 
         return infoCommit;
+    }
+
+    private void parseCommitArrayListAndWriteOnFile(List<Commit> commitList) {
+        System.out.println("Generating " + REFACTORING_TYPE_FOUND_FILENAME);
+        List<RefactoringCSV> refactoringList = new ArrayList<RefactoringCSV>();
+        for (Commit c : commitList) {
+            for (Refactoring r : c.getRefactoringList()) {
+                toString().replace('\t', ' ');
+                refactoringList.add(
+                        new RefactoringCSV(
+                                c.getHash(),
+                                r.getRefactoringType().getDisplayName(),
+                                r.toString().replace('\t', ' '))
+                );
+            }
+        }
+        CSVService.writeCsvFile(
+                resultsDir + "\\" + REFACTORING_TYPE_FOUND_FILENAME,
+                refactoringList,
+                RefactoringCSV.class);
     }
 }

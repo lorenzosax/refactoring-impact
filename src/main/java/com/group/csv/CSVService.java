@@ -36,7 +36,7 @@ public class CSVService {
             Writer writer = Files.newBufferedWriter(Paths.get(filename));
             StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder(writer)
                     .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                    .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                    .withQuotechar(CSVWriter.DEFAULT_QUOTE_CHARACTER)
                     .withEscapechar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
                     .withLineEnd(CSVWriter.DEFAULT_LINE_END)
                     .build();
@@ -58,7 +58,7 @@ public class CSVService {
             StatefulBeanToCsv beanWriter = builder
                     .withMappingStrategy(strategy)
                     .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                    .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                    .withQuotechar(CSVWriter.DEFAULT_QUOTE_CHARACTER)
                     .withEscapechar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
                     .withLineEnd(CSVWriter.DEFAULT_LINE_END)
                     .build();
