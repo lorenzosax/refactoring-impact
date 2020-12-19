@@ -42,14 +42,32 @@ public class RefactoringMinerWorker {
         this.writeOutputOnFile = writeOutputOnFile;
     }
 
-    public ArrayList<Commit> getCommitListRefactoringAffected() throws Exception {
-        return getCommitListRefactoringAffected("main");
+    public ArrayList<Commit> getRefactoringsForCommits() throws Exception {
+        return getRefactoringsForCommits("main");
     }
 
-    public ArrayList<Commit> getCommitListRefactoringAffected(String branch) throws Exception {
+    public ArrayList<Commit> getRefactoringsForCommits(String branch) throws Exception {
         System.out.println("Run Refactoring Miner...");
         ArrayList<Commit> commitArrayList = new ArrayList<>();
         miner.detectAll(repo, branch, new RefactoringHandler() {
+            @Override
+            public void handle(String commitId, List<Refactoring> refactorings) {
+                if (refactorings.size() > 0) {
+                    commitArrayList.add(new Commit(commitId, refactorings));
+                }
+            }
+        });
+        System.out.println("Refactoring Miner Done!");
+        if (this.writeOutputOnFile) {
+            parseCommitArrayListAndWriteOnFile(commitArrayList);
+        }
+        return commitArrayList;
+    }
+
+    public ArrayList<Commit> getRefactoringsForCommitsWithRange(String startCommitId, String endCommitId) throws Exception {
+        System.out.println("Run Refactoring Miner with detection between commits...");
+        ArrayList<Commit> commitArrayList = new ArrayList<>();
+        miner.detectBetweenCommits(repo, startCommitId, endCommitId, new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<Refactoring> refactorings) {
                 if (refactorings.size() > 0) {
@@ -131,7 +149,6 @@ public class RefactoringMinerWorker {
         List<RefactoringCSV> refactoringList = new ArrayList<RefactoringCSV>();
         for (Commit c : commitList) {
             for (Refactoring r : c.getRefactoringList()) {
-                toString().replace('\t', ' ');
                 refactoringList.add(
                         new RefactoringCSV(
                                 c.getHash(),

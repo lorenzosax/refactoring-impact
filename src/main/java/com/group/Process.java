@@ -21,10 +21,13 @@ public class Process {
         // region Load Configurations
         Config conf = ConfigFactory.load();
         String repoDir = conf.getString("repo.dir");
+        boolean refactoringMinerDetectBetweenCommits = conf.getBoolean("refactoring-miner.detect-between-commits");
+        String refactoringMinerStartCommitId = conf.getString("refactoring-miner.start-commit-id");
+        String refactoringMinerEndCommitId = conf.getString("refactoring-miner.end-commit-id");
+        boolean writeRefactoringMinerOutputOnFile = conf.getBoolean("refactoring-miner.write-on-file");
         String designiteDir = conf.getString("designite.dir");
         String sonarQubeServerBinDir = conf.getString("sonarqube.server.bin-dir");
         String sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
-        boolean writeRefactoringMinerOutputOnFile = conf.getBoolean("results.refactoring-miner.write-on-file");
         String resultsDir = conf.getString("results.dir");
         // endregion
 
@@ -36,7 +39,13 @@ public class Process {
 
         System.out.println("<Start process>");
 
-        ArrayList<Commit> commitList = refactoringMinerWorker.getCommitListRefactoringAffected();
+        ArrayList<Commit> commitList;
+        if (refactoringMinerDetectBetweenCommits) {
+            commitList = refactoringMinerWorker.getRefactoringsForCommitsWithRange(
+                    refactoringMinerStartCommitId, refactoringMinerEndCommitId);
+        } else {
+            commitList = refactoringMinerWorker.getRefactoringsForCommits();
+        }
 
         for (Commit commit : commitList) {
 
