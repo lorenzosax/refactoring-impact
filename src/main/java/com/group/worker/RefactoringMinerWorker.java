@@ -1,5 +1,6 @@
 package com.group.worker;
 
+import com.group.pojo.InfoCommit;
 import org.buildobjects.process.ProcBuilder;
 import org.buildobjects.process.ProcResult;
 import org.eclipse.jgit.lib.Repository;
@@ -77,7 +78,7 @@ public class RefactoringMinerWorker {
         return null;
     }
 
-    public boolean checkoutToCommit(String commitHashId) throws Exception {
+    public boolean checkoutToCommit(String commitHashId) {
         ProcResult procResult = new ProcBuilder("git")
                 .withWorkingDirectory(new File(repo.getDirectory().getParent()))
                 .withArg("checkout")
@@ -87,5 +88,28 @@ public class RefactoringMinerWorker {
 
         System.out.println("Checkout to commit hash: " + commitHashId);
         return true;
+    }
+
+    public InfoCommit getInformationCommit(String commitHashId) {
+        ProcResult procResult = new ProcBuilder("git")
+                .withWorkingDirectory(new File(repo.getDirectory().getParent()))
+                .withArg("log")
+                .withArg("--pretty=format:\"Commit:%n%H%n%cn%n%ce\"")
+                .withArg(commitHashId)
+                .run();
+
+
+        return parseInfoCommit(procResult);
+    }
+
+    private static InfoCommit parseInfoCommit(ProcResult procResult) {
+        InfoCommit infoCommit = null;
+
+        String[] results =  procResult.getOutputString() != null ? procResult.getOutputString().split("\n") : null;
+        if (results != null && results.length > 3) {
+            infoCommit = new InfoCommit(results[1], results[2], results[3]);
+        }
+
+        return infoCommit;
     }
 }

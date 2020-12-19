@@ -46,4 +46,21 @@ public class Smell implements Serializable {
     public String getCodeSmell() {
         return codeSmell;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if ( (this.methodName == null && ((Smell)obj).getMethodName() != null) ||
+                (this.methodName != null && ((Smell)obj).getMethodName() == null))
+            return false;
+
+        return this.projectName.equals(((Smell)obj).getProjectName()) &&
+                this.packageName.equals(((Smell)obj).getPackageName()) &&
+                this.className.equals(((Smell)obj).getClassName()) &&
+                (
+                    (this.methodName == null && ((Smell)obj).getMethodName() == null) ||
+                        this.methodName.equals(((Smell)obj).getMethodName())
+                ) &&
+                this.codeSmell.equals(((Smell)obj).getCodeSmell());
+    }
 }

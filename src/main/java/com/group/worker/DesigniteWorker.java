@@ -22,6 +22,7 @@ public class DesigniteWorker {
     static final Map<String, Boolean> ALLOWED_SMELL = new HashMap<String, Boolean>() {{
        put("Long Method", true);
        put("Long Parameter List", true);
+       put("Insufficient Modularization", true);
        put("Multifaceted Abstraction", true);
     }};
 
