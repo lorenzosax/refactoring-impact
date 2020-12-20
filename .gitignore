@@ -5,6 +5,7 @@ src/main/resources/application.conf
 .classpath
 .project
 .settings/
+/bin/
 
 
 # Ignore Gradle GUI config
