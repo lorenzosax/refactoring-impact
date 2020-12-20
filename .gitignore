@@ -6,7 +6,6 @@ src/main/resources/application.conf
 .project
 .settings/
 
-
 # Ignore Gradle GUI config
 gradle-app.setting
 
