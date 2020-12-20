@@ -8,8 +8,6 @@ import com.group.pojo.ProcessResult;
 import com.group.worker.DesigniteWorker;
 import com.group.worker.RefactoringMinerWorker;
 import com.group.worker.SonarQubeWorker;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 
 import java.util.*;
 
@@ -20,16 +18,16 @@ public class Process {
     public static void main(String[] args) throws Exception {
 
         // region Load Configurations
-        Config conf = ConfigFactory.load();
-        String repoDir = conf.getString("repo.dir");
-        boolean refactoringMinerDetectBetweenCommits = conf.getBoolean("refactoring-miner.detect-between-commits");
-        String refactoringMinerStartCommitId = conf.getString("refactoring-miner.start-commit-id");
-        String refactoringMinerEndCommitId = conf.getString("refactoring-miner.end-commit-id");
-        boolean writeRefactoringMinerOutputOnFile = conf.getBoolean("refactoring-miner.write-on-file");
-        String designiteDir = conf.getString("designite.dir");
-        String sonarQubeServerBaseUrl = conf.getString("sonarqube.server.base-url");
-        String sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
-        String resultsDir = conf.getString("results.dir");
+        Configuration conf = Configuration.getInstance();
+        String repoDir = conf.getRepoDir();
+        boolean refactoringMinerDetectBetweenCommits = conf.isRefactoringMinerDetectBetweenCommits();
+        String refactoringMinerStartCommitId = conf.getRefactoringMinerStartCommitId();
+        String refactoringMinerEndCommitId = conf.getRefactoringMinerEndCommitId();
+        boolean writeRefactoringMinerOutputOnFile = conf.isWriteRefactoringMinerOutputOnFile();
+        String designiteDir = conf.getDesigniteDir();
+        String sonarQubeServerBaseUrl = conf.getSonarQubeServerBaseUrl();
+        String sonarQubeScannerBinDir = conf.getSonarQubeScannerBinDir();
+        String resultsDir = conf.getResultsDir();
         // endregion
 
         List<ProcessResult> resultList = new ArrayList<>();
