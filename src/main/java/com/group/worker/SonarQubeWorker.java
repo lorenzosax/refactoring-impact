@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
 
@@ -19,20 +20,33 @@ public class SonarQubeWorker {
 
 	private static final String USER_AGENT = "Mozilla/5.0";
 
-	private static final String COMPONENT_TREE_API = "/api/measures/component_tree?component=moneytransfer45864560&metricKeys=sqale_index&qualifiers=FIL&ps=500&pageIndex=";
+	private static final String COMPONENT_TREE_API = "/api/measures/component_tree?component=";
+	private static final String PARAMETERS = "&metricKeys=sqale_index&qualifiers=FIL&ps=500&pageIndex=";
 
 	private String baseUrl;
 	private String sonarScannerDir;
 	private String repoDir;
+	private String project;
 
 	public SonarQubeWorker(String sonarQubeServerBaseUrl, String sonarScannerDir, String repoDir) {
 		this.baseUrl = sonarQubeServerBaseUrl;
 		this.sonarScannerDir = sonarScannerDir;
 		this.repoDir = repoDir;
+		StringTokenizer stringTokenizer = new StringTokenizer(repoDir, "\\\\");
+		while (stringTokenizer.hasMoreElements())
+			this.project = stringTokenizer.nextToken();
 	}
 
-	private void sendGET() throws IOException {
-		URL obj = new URL(this.baseUrl + COMPONENT_TREE_API);
+	public Analysis getAnalysisRequest(String commitHash) throws IOException {
+
+		String projectSonar = this.project.concat("_").concat(commitHash);
+
+		return new Gson().fromJson(HTTPGETRequest(projectSonar).toString(), Analysis.class);
+
+	}
+
+	private StringBuffer HTTPGETRequest(String projectSonar) throws IOException {
+		URL obj = new URL(this.baseUrl + COMPONENT_TREE_API + projectSonar + PARAMETERS);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
 		con.setRequestProperty("User-Agent", USER_AGENT);
@@ -49,13 +63,11 @@ public class SonarQubeWorker {
 			}
 			in.close();
 
-			Analysis an = new Gson().fromJson(response.toString(), Analysis.class);
-
-			System.out.println(an.toString());
+			return response;
 		} else {
 			System.out.println("GET request not worked");
 		}
-
+		return null;
 	}
 
 	public void executeScanning(String commitHashId) {
@@ -67,22 +79,17 @@ public class SonarQubeWorker {
 	}
 
 	private void generatePropertiesFile(String commitHashId) {
-		String project = null;
-		StringTokenizer stringTokenizer = new StringTokenizer(repoDir, "\\\\");
-
-		while (stringTokenizer.hasMoreElements())
-			project = stringTokenizer.nextToken();
 
 		try {
 			BufferedWriter writer = new BufferedWriter(
 					new FileWriter(this.repoDir + "\\sonar-project.properties", false));
 			writer.append("sonar.projectKey=");
-			writer.append(project);
+			writer.append(this.project);
 			writer.append("_");
 			writer.append(commitHashId);
 			writer.append("\n");
 			writer.append("sonar.projectName=");
-			writer.append(project);
+			writer.append(this.project);
 			writer.append("_");
 			writer.append(commitHashId);
 			writer.append("\n");

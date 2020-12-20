@@ -1,15 +1,17 @@
 package com.group;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.group.csv.CSVService;
 import com.group.csv.Smell;
 import com.group.pojo.Commit;
 import com.group.pojo.InfoCommit;
 import com.group.pojo.ProcessResult;
+import com.group.pojo.sonar.Analysis;
 import com.group.worker.DesigniteWorker;
 import com.group.worker.RefactoringMinerWorker;
 import com.group.worker.SonarQubeWorker;
-
-import java.util.*;
 
 public class Process {
 
@@ -77,6 +79,11 @@ public class Process {
                             // TODO s0 smell resolved: investigate what the reference refactoring type is
                             // TODO run sonar-scanner only once (at most) per commit
                             sonarQubeWorker.executeScanning(commitHashId);
+                            
+                            //Analysis analysisActual = sonarQubeWorker.getAnalysisRequest(commitHashId);
+                            //Analysis analysisPrevious = sonarQubeWorker.getAnalysisRequest(previousCommitHashId);
+                            
+                            
                         }
                         resultList.add(pr);
                     }
