@@ -27,6 +27,7 @@ public class Process {
         String refactoringMinerEndCommitId = conf.getString("refactoring-miner.end-commit-id");
         boolean writeRefactoringMinerOutputOnFile = conf.getBoolean("refactoring-miner.write-on-file");
         String designiteDir = conf.getString("designite.dir");
+        String sonarQubeServerBaseUrl = conf.getString("sonarqube.server.base-url");
         String sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
         String resultsDir = conf.getString("results.dir");
         // endregion
@@ -36,7 +37,7 @@ public class Process {
         RefactoringMinerWorker refactoringMinerWorker =
                 new RefactoringMinerWorker(repoDir, resultsDir, writeRefactoringMinerOutputOnFile);
         DesigniteWorker designiteWorker = new DesigniteWorker(designiteDir, repoDir, resultsDir);
-        SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeScannerBinDir,repoDir);
+        SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeServerBaseUrl, sonarQubeScannerBinDir,repoDir);
 
         System.out.println("<Start process>");
 
@@ -75,11 +76,9 @@ public class Process {
                             pr.setSmellRemoved(false);
                         } else {
                             pr.setSmellRemoved(true);
-                            // lo smell s0 è stato risolto: indagare quale refactoring di riferimento
-                            // sonarscanner
-
+                            // TODO s0 smell resolved: investigate what the reference refactoring type is
+                            // TODO run sonar-scanner only once (at most) per commit
                             sonarQubeWorker.executeScanning(commitHashId);
-
                         }
                         resultList.add(pr);
                     }

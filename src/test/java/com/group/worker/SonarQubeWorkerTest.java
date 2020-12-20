@@ -15,10 +15,11 @@ public class SonarQubeWorkerTest {
 
         Config conf = ConfigFactory.load();
         String repoDir = conf.getString("repo.dir");
+        String sonarQubeServerBaseUrl = conf.getString("sonarqube.server.base-url");
         String sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
 
-        SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeScannerBinDir,repoDir);
-        sonarQubeWorker.executeScanning("1234");
+        SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeServerBaseUrl, sonarQubeScannerBinDir, repoDir);
+        sonarQubeWorker.executeScanning("TEST");
 
         assert true;
     }

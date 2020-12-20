@@ -11,22 +11,21 @@ import java.net.URL;
 public class SonarQubeWorker {
 
     private static final String USER_AGENT = "Mozilla/5.0";
-    private static final String uriApi = "http://localhost:9000/api/measures/component_tree?component=moneytransfer45864560&metricKeys=sqale_index&qualifiers=FIL&ps=500&pageIndex=";
 
+    private static final String COMPONENT_TREE_API = "/api/measures/component_tree?component=moneytransfer45864560&metricKeys=sqale_index&qualifiers=FIL&ps=500&pageIndex=";
+
+    private String baseUrl;
     private String sonarScannerDir;
     private String repoDir;
 
-    public SonarQubeWorker(String sonarScannerDir, String repoDir) {
+    public SonarQubeWorker(String sonarQubeServerBaseUrl, String sonarScannerDir, String repoDir) {
+        this.baseUrl = sonarQubeServerBaseUrl;
         this.sonarScannerDir = sonarScannerDir;
-        this.repoDir = adjustPath(repoDir);
+        this.repoDir = repoDir;
     }
 
-    private String adjustPath(String repoDir) {
-        return repoDir.replaceAll("\\\\", "\\\\\\\\");
-    }
-
-    private static void sendGET() throws IOException {
-        URL obj = new URL(uriApi);
+    private void sendGET() throws IOException {
+        URL obj = new URL(this.baseUrl + COMPONENT_TREE_API);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", USER_AGENT);
@@ -53,26 +52,29 @@ public class SonarQubeWorker {
     }
 
     public void executeScanning(String commitHashId) {
-        preparePropertiesFile(commitHashId);
-        new ProcBuilder("sonar-scanner.bat")
-                .withWorkingDirectory(new File(this.sonarScannerDir)).withNoTimeout().run();
+        System.out.println("Run Sonar Scanner...");
+        generatePropertiesFile(commitHashId);
+        new ProcBuilder("cmd")
+                .withWorkingDirectory(new File(this.repoDir))
+                .withArg("/c")
+                .withArg(this.sonarScannerDir + "\\sonar-scanner.bat")
+                .withNoTimeout()
+                .run();
+        System.out.println("Sona Scanner Done!");
     }
 
-    private void preparePropertiesFile(String commitHashId) {
-
+    private void generatePropertiesFile(String commitHashId) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(this.sonarScannerDir + "\\sonar-project.properties", false));
-            writer.append("sonar.projectKey=project");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(this.repoDir + "\\sonar-project.properties", false));
+            writer.append("sonar.projectKey=project_");
             writer.append(commitHashId);
             writer.append("\n");
-            writer.append("sonar.projectName=project");
+            writer.append("sonar.projectName=project_");
             writer.append(commitHashId);
             writer.append("\n");
-            writer.append("sonar.sources=");
-            writer.append(this.repoDir);
-            writer.append("\\\\src\n");
+            writer.append("sonar.sources=src");
+            writer.append("\n");
             writer.append("sonar.java.binaries=.");
-            //writer.append(this.repoDir);
             writer.append("\n");
             writer.append("sonar.scm.disabled=true");
 
@@ -80,10 +82,5 @@ public class SonarQubeWorker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
     }
-
-
 }
