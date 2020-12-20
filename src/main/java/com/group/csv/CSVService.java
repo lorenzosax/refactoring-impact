@@ -8,12 +8,13 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CSVService {
 
     public static <T> List readCsvFile(String filename, Class<T> clazz) {
-        List<T> csvSmellList = null;
+        List<T> csvSmellList = new ArrayList<>();
         try {
             Reader reader = Files.newBufferedReader(Paths.get(filename));
             CsvToBean<T> csvToBean = new CsvToBeanBuilder<T>(reader)
