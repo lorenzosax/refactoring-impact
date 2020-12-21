@@ -3,7 +3,7 @@ package com.group.csv;
 import com.group.csv.annotation.CsvBindByNameOrder;
 import com.opencsv.bean.CsvBindByName;
 
-@CsvBindByNameOrder({"Commit","Committer Name","Committer Email","Class","Method","Refactoring Type","Smell Type","TD difference","TD Class","Smell Removed})
+@CsvBindByNameOrder({"Commit","Committer Name","Committer Email","Class","Method","Refactoring Type","Smell Type","TD difference","TD Class","Smell Removed"})
 public class ProcessResult {
 
     public enum TD_CLASS { IMPROVED, STABLE, PEJORATIVE};
