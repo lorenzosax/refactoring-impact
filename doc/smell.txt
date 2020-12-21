@@ -1,43 +1,10 @@
-		GURU									REFACTORING_MINER
-SMELL
-DESIGNITE:
-	--> refactoring type
-
-	rule
-
---------------------------------------------------------------------------------------------------
+SMELL DESIGNITE									REFACTORING_MINER
 
 Long Method (Complex Method)					Extract Method
 
 Long Parameter List								Merge Parameter, Remove Parameter
 
 Multifaceted Abstraction						Extract Class, Extract Subclass
-(corrisponde al God Class)
 
-
-
-
-
-
-
-
-
-
-Long Method:
-	--> Extract Method							Extract Method
-		Replace Temp with Query					Split Variable / Split Parameter / Split Attribute
-		Introduce Parameter Object				...
-		Preserve Whole Object					...
-		Replace Method with Method Object		...
-		Decompose Conditional					...
-
-	rule: Extract Method OR Split Variable OR Split Parameter OR Split Attribute
-	(consideriamo il nome del metodo)
-
-Large Class:
-	--> Extract Class							Extract Class
-		Extract Subclass						Extract Subclass
-		Extract Interface						Extract Interface
-
-	rule: Extract Class OR Extract Subclass OR Extract Interface
-	(consideriamo il nome della classe)
+Insufficient Modularization						Extract Class, Extract Subclass
+(God Class)

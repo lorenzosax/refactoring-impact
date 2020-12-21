@@ -7,10 +7,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.StringTokenizer;
 
+import com.group.pojo.sonar.Component;
+import com.group.pojo.sonar.Measure;
 import org.buildobjects.process.ProcBuilder;
 
 import com.google.gson.Gson;
@@ -37,15 +38,15 @@ public class SonarQubeWorker {
 			this.project = stringTokenizer.nextToken();
 	}
 
-	public Analysis getAnalysisRequest(String commitHash) throws IOException {
+	public Analysis getAnalysisFor(String commitHash) throws IOException {
 
 		String projectSonar = this.project.concat("_").concat(commitHash);
 
-		return new Gson().fromJson(HTTPGETRequest(projectSonar).toString(), Analysis.class);
+		return new Gson().fromJson(httpGetRequest(projectSonar).toString(), Analysis.class);
 
 	}
 
-	private StringBuffer HTTPGETRequest(String projectSonar) throws IOException {
+	private StringBuffer httpGetRequest(String projectSonar) throws IOException {
 		URL obj = new URL(this.baseUrl + COMPONENT_TREE_API + projectSonar + PARAMETERS);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
@@ -76,6 +77,21 @@ public class SonarQubeWorker {
 		new ProcBuilder("cmd").withWorkingDirectory(new File(this.repoDir)).withArg("/c")
 				.withArg(this.sonarScannerDir + "\\sonar-scanner.bat").withNoTimeout().run();
 		System.out.println("Sona Scanner Done!");
+	}
+
+	public Integer extractTdFromComponent(Analysis analysis, String classPath) {
+		if (analysis != null) {
+			for (Component c : analysis.getComponents()) {
+				if (c.getPath().equals(classPath)) {
+					for (Measure m : c.getMeasures()) {
+						if (m.getMetric().equals("sqale_index")) {
+							return Integer.parseInt(m.getValue());
+						}
+					}
+				}
+			}
+		}
+		return 0;
 	}
 
 	private void generatePropertiesFile(String commitHashId) {

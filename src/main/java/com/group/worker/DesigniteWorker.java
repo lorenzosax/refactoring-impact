@@ -1,16 +1,15 @@
 package com.group.worker;
 
-import com.group.csv.CSVDesignSmell;
-import com.group.csv.CSVImplementationSmell;
+import com.group.Utils;
+import com.group.csv.DesignSmell;
+import com.group.csv.ImplementationSmell;
 import com.group.csv.CSVService;
 import com.group.csv.Smell;
 import org.buildobjects.process.ProcBuilder;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DesigniteWorker {
 
@@ -18,13 +17,6 @@ public class DesigniteWorker {
     private static final String DESIGN_CODE_SMELLS_FILENAME = "designCodeSmells.csv";
     private static final String IMPLEMENTATION_CODE_SMELLS_FILENAME = "implementationCodeSmells.csv";
     private static final String FILTERED_SMELLS_FILENAME = "filteredSmells.csv";
-
-    static final Map<String, Boolean> ALLOWED_SMELL = new HashMap<String, Boolean>() {{
-       put("Long Method", true);
-       put("Long Parameter List", true);
-       put("Insufficient Modularization", true);
-       put("Multifaceted Abstraction", true);
-    }};
 
     private String designiteDir;
     private String repoDir;
@@ -57,16 +49,16 @@ public class DesigniteWorker {
         System.out.println("Designite Done!");
 
         System.out.println("Read " + DESIGN_CODE_SMELLS_FILENAME);
-        List<CSVDesignSmell> designSmellList = CSVService.readCsvFile(
-                outputPath + DESIGN_CODE_SMELLS_FILENAME, CSVDesignSmell.class);
+        List<DesignSmell> designSmellList = CSVService.readCsvFile(
+                outputPath + DESIGN_CODE_SMELLS_FILENAME, DesignSmell.class);
         System.out.println("Read " + IMPLEMENTATION_CODE_SMELLS_FILENAME);
-        List<CSVImplementationSmell> implementationSmellList = CSVService.readCsvFile(
+        List<ImplementationSmell> implementationSmellList = CSVService.readCsvFile(
                 outputPath + IMPLEMENTATION_CODE_SMELLS_FILENAME,
-                CSVImplementationSmell.class);
+                ImplementationSmell.class);
 
         List<Smell> smellList = new ArrayList<>();
-        for(CSVDesignSmell ds : designSmellList) {
-            if (ALLOWED_SMELL.containsKey(ds.getCodeSmell())) {
+        for(DesignSmell ds : designSmellList) {
+            if (Utils.allowedSmellWithRefactoringTypes.containsKey(ds.getCodeSmell())) {
                 smellList.add(
                         new Smell(
                                 ds.getProjectName(),
@@ -78,8 +70,8 @@ public class DesigniteWorker {
             }
         }
 
-        for(CSVImplementationSmell is : implementationSmellList) {
-            if (ALLOWED_SMELL.containsKey(is.getCodeSmell())) {
+        for(ImplementationSmell is : implementationSmellList) {
+            if (Utils.allowedSmellWithRefactoringTypes.containsKey(is.getCodeSmell())) {
                 smellList.add(
                         new Smell(
                                 is.getProjectName(),

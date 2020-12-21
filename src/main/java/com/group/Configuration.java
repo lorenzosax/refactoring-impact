@@ -7,21 +7,23 @@ import org.apache.commons.lang3.StringUtils;
 public class Configuration {
     private static final Configuration instance = new Configuration();
 
-    private String repoDir;
-    private boolean refactoringMinerDetectBetweenCommits;
-    private String refactoringMinerStartCommitId;
-    private String refactoringMinerEndCommitId;
-    private boolean writeRefactoringMinerOutputOnFile;
-    private String designiteDir;
-    private String sonarQubeServerBaseUrl;
-    private String sonarQubeScannerBinDir;
-    private String resultsDir;
+    private final String repoDir;
+    private final String refactoringMinerBranchToAnalyze;
+    private final boolean refactoringMinerDetectBetweenCommits;
+    private final String refactoringMinerStartCommitId;
+    private final String refactoringMinerEndCommitId;
+    private final boolean writeRefactoringMinerOutputOnFile;
+    private final String designiteDir;
+    private final String sonarQubeServerBaseUrl;
+    private final String sonarQubeScannerBinDir;
+    private final String resultsDir;
 
-    private boolean isWindowsSystem;
+    private final boolean isWindowsSystem;
 
     private Configuration() {
         Config conf = ConfigFactory.load();
         repoDir = conf.getString("repo.dir");
+        refactoringMinerBranchToAnalyze = conf.getString("refactoring-miner.branch-to-analyze");
         refactoringMinerDetectBetweenCommits = conf.getBoolean("refactoring-miner.detect-between-commits");
         refactoringMinerStartCommitId = conf.getString("refactoring-miner.start-commit-id");
         refactoringMinerEndCommitId = conf.getString("refactoring-miner.end-commit-id");
@@ -40,6 +42,10 @@ public class Configuration {
 
     public String getRepoDir() {
         return repoDir;
+    }
+
+    public String getRefactoringMinerBranchToAnalyze() {
+        return refactoringMinerBranchToAnalyze;
     }
 
     public boolean isRefactoringMinerDetectBetweenCommits() {

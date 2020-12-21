@@ -4,7 +4,7 @@ import com.opencsv.bean.CsvBindByPosition;
 
 import java.io.Serializable;
 
-public class CSVDesignSmell implements Serializable {
+public class ImplementationSmell implements Serializable {
 
     @CsvBindByPosition(position = 0)
     private String projectName;
@@ -13,14 +13,17 @@ public class CSVDesignSmell implements Serializable {
     @CsvBindByPosition(position = 2)
     private String className;
     @CsvBindByPosition(position = 3)
+    private String methodName;
+    @CsvBindByPosition(position = 4)
     private String codeSmell;
 
-    public CSVDesignSmell() {}
+    public ImplementationSmell() {}
 
-    public CSVDesignSmell(String projectName, String packageName, String className, String codeSmell) {
+    public ImplementationSmell(String projectName, String packageName, String className, String methodName, String codeSmell) {
         this.projectName = projectName;
         this.packageName = packageName;
         this.className = className;
+        this.methodName = methodName;
         this.codeSmell = codeSmell;
     }
 
@@ -46,6 +49,14 @@ public class CSVDesignSmell implements Serializable {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
     }
 
     public String getCodeSmell() {

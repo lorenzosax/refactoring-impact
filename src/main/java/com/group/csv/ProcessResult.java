@@ -1,16 +1,32 @@
-package com.group.pojo;
+package com.group.csv;
 
+import com.group.csv.annotation.CsvBindByNameOrder;
+import com.opencsv.bean.CsvBindByName;
+
+@CsvBindByNameOrder({"Commit","Refactoring Type","Description"})
 public class ProcessResult {
 
+    public enum TD_CLASS { IMPROVED, STABLE, PEJORATIVE};
+
+    @CsvBindByName(column = "Commit")
     private String commitHash;
+    @CsvBindByName(column = "Committer Name")
     private String committerName;
+    @CsvBindByName(column = "Committer Email")
     private String committerEmail;
+    @CsvBindByName(column = "Class")
     private String className;
+    @CsvBindByName(column = "Method")
     private String methodName;
+    @CsvBindByName(column = "Refactoring Type")
     private String refactoringType;
+    @CsvBindByName(column = "Smell Type")
     private String smellType;
+    @CsvBindByName(column = "TD difference")
     private Integer tdDifference;
-    private String tdClass;
+    @CsvBindByName(column = "TD Class")
+    private TD_CLASS tdClass;
+    @CsvBindByName(column = "Smell Removed")
     private boolean isSmellRemoved;
 
     public ProcessResult() {
@@ -19,7 +35,7 @@ public class ProcessResult {
 
     public ProcessResult(String commitHash, String committerName, String committerEmail, String className,
                          String methodName, String refactoringType, String smellType, Integer tdDifference,
-                         String tdClass, boolean isSmellRemoved) {
+                         TD_CLASS tdClass, boolean isSmellRemoved) {
         this.commitHash = commitHash;
         this.committerName = committerName;
         this.committerEmail = committerEmail;
@@ -96,11 +112,11 @@ public class ProcessResult {
         this.tdDifference = tdDifference;
     }
 
-    public String getTdClass() {
+    public TD_CLASS getTdClass() {
         return tdClass;
     }
 
-    public void setTdClass(String tdClass) {
+    public void setTdClass(TD_CLASS tdClass) {
         this.tdClass = tdClass;
     }
 
@@ -110,5 +126,14 @@ public class ProcessResult {
 
     public void setSmellRemoved(boolean smellRemoved) {
         isSmellRemoved = smellRemoved;
+    }
+
+    public static TD_CLASS getTdClassFor(Integer value) {
+        if (value > 0)
+            return TD_CLASS.PEJORATIVE;
+        else if (value < 0)
+            return TD_CLASS.IMPROVED;
+        else
+            return TD_CLASS.STABLE;
     }
 }
