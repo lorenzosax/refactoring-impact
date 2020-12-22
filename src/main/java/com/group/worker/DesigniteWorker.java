@@ -25,10 +25,6 @@ public class DesigniteWorker {
     public DesigniteWorker(String designiteDir, String repoDir, String resultsDir){
         this.designiteDir = designiteDir;
         this.repoDir = repoDir;
-        new ProcBuilder("mkdir")
-                .withWorkingDirectory(new File(resultsDir))
-                .withArg(DESIGNITE_RESULTS_FOLDER)
-                .run();
         this.resultsDir = resultsDir + "\\" + DESIGNITE_RESULTS_FOLDER + "\\";
     }
 
