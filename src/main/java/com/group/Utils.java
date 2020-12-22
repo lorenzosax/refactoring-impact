@@ -29,7 +29,7 @@ public class Utils {
         }});
     }};
 
-    public static final Map<RefactoringType, Boolean> refactoringsConsidered = new HashMap<>() {{
+    public static final Map<RefactoringType, Boolean> refactoringsConsidered = new HashMap<RefactoringType, Boolean>() {{
         put(RefactoringType.EXTRACT_OPERATION, true);
         put(RefactoringType.MERGE_PARAMETER, true);
         put(RefactoringType.REMOVE_PARAMETER, true);
