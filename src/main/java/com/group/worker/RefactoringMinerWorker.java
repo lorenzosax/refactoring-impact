@@ -91,6 +91,7 @@ public class RefactoringMinerWorker {
                 .withArg("-n")
                 .withArg("1")
                 .withArg(commitHashId)
+                .withNoTimeout()
                 .run();
 
         Pattern pattern = Pattern.compile(" (.*)");
@@ -113,6 +114,7 @@ public class RefactoringMinerWorker {
                 .withArg("checkout")
                 .withArg("-f")
                 .withArg(commitHashId)
+                .withNoTimeout()
                 .run();
 
         System.out.println("Checkout to commit hash: " + commitHashId);
@@ -125,6 +127,7 @@ public class RefactoringMinerWorker {
                 .withArg("log")
                 .withArg("--pretty=format:\"Commit:%n%H%n%cn%n%ce\"")
                 .withArg(commitHashId)
+                .withNoTimeout()
                 .run();
 
 
