@@ -112,8 +112,8 @@ public class Process {
                                         sonarQubeRequestAlreadyDone = true;
                                     }
 
-                                    tdDiff = sonarQubeWorker.extractTdFromComponent(actualAnalysis, r.leftSide().get(0).getFilePath())
-                                            - sonarQubeWorker.extractTdFromComponent(previousAnalysis, r.leftSide().get(0).getFilePath());
+                                    tdDiff = sonarQubeWorker.extractTdFromComponent(previousAnalysis, r.leftSide().get(0).getFilePath())
+                                    		-sonarQubeWorker.extractTdFromComponent(actualAnalysis, r.leftSide().get(0).getFilePath());
 
                                     pr.setTdDifference(tdDiff);
                                     pr.setTdClass(ProcessResult.getTdClassFor(tdDiff));

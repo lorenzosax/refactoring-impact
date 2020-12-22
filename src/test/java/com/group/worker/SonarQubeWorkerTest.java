@@ -33,7 +33,7 @@ public class SonarQubeWorkerTest {
 		String sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
 
 		SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeServerBaseUrl, sonarQubeScannerBinDir, repoDir);
-		Analysis analysis =sonarQubeWorker.getAnalysisRequest("9ad9f468c083840b8946732c8896d842a4d7a5a2");
+		Analysis analysis =sonarQubeWorker.getAnalysisFor("9ad9f468c083840b8946732c8896d842a4d7a5a2");
 		
 		
 		assert true;

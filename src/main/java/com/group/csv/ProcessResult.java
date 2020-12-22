@@ -129,9 +129,9 @@ public class ProcessResult {
     }
 
     public static TD_CLASS getTdClassFor(Integer value) {
-        if (value > 0)
+        if (value < 0)
             return TD_CLASS.PEJORATIVE;
-        else if (value < 0)
+        else if (value > 0)
             return TD_CLASS.IMPROVED;
         else
             return TD_CLASS.STABLE;
