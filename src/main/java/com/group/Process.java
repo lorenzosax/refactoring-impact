@@ -74,47 +74,45 @@ public class Process {
                     List<Smell> smellListActualCommit = designiteWorker.execute(commitHashId);
 
                     boolean sonarQubeScanningAlreadyDone = false;
-                    boolean sonarQubeRequestAlreadyDone = false;
                     Integer tdDiff;
                     Analysis actualAnalysis = null, previousAnalysis = null;
                     for (Smell s0 : smellListPreviousCommit) {
                         for (Refactoring r : commit.getRefactoringList()) {
-                            if (r.leftSide() != null && r.leftSide().size() > 0
-                                    && isSamePathClass(getPackagesWithClassPath(r.leftSide().get(0).getFilePath()), generateSmellClassPath(s0.getPackageName(), s0.getClassName()))
-                                    && (s0.getMethodName() == null || isSameMethod(r.leftSide().get(0).getCodeElement(), s0.getMethodName()))
-                            ) {
 
+                            ProcessResult pr = new ProcessResult();
+                            pr.setCommitHash(commitHashId);
+                            pr.setClassName(s0.getClassName());
+                            pr.setMethodName(s0.getMethodName() == null ? "-" : s0.getMethodName());
+                            pr.setCommitterName(infoCommit.getAuthor());
+                            pr.setCommitterEmail(infoCommit.getEmail());
+                            pr.setSmellType(s0.getCodeSmell());
+                            pr.setSmellRemoved(!smellListActualCommit.contains(s0));
+                            pr.setRefactoringType(r.getRefactoringType().getDisplayName());
 
-                                if (!sonarQubeScanningAlreadyDone) {
-                                    sonarQubeWorker.executeScanning(commitHashId);
-                                    refactoringMinerWorker.checkoutToCommit(previousCommitHashId);
-                                    sonarQubeWorker.executeScanning(previousCommitHashId);
-                                    sonarQubeScanningAlreadyDone = true;
-                                }
+                            if (!sonarQubeScanningAlreadyDone) {
+                                sonarQubeWorker.executeScanning(commitHashId);
+                                refactoringMinerWorker.checkoutToCommit(previousCommitHashId);
+                                sonarQubeWorker.executeScanning(previousCommitHashId);
 
-                                if (!sonarQubeRequestAlreadyDone) {
-                                    actualAnalysis = sonarQubeWorker.getAnalysisFor(commitHashId);
-                                    previousAnalysis = sonarQubeWorker.getAnalysisFor(previousCommitHashId);
-                                    sonarQubeRequestAlreadyDone = true;
-                                }
-
-                                tdDiff = sonarQubeWorker.extractTdFromComponent(previousAnalysis, r.leftSide().get(0).getFilePath())
-                                        -sonarQubeWorker.extractTdFromComponent(actualAnalysis, r.leftSide().get(0).getFilePath());
-
-                                ProcessResult pr = new ProcessResult();
-                                pr.setCommitHash(commitHashId);
-                                pr.setClassName(s0.getClassName());
-                                pr.setMethodName(s0.getMethodName());
-                                pr.setCommitterName(infoCommit.getAuthor());
-                                pr.setCommitterEmail(infoCommit.getEmail());
-                                pr.setSmellType(s0.getCodeSmell());
-                                pr.setSmellRemoved(smellListActualCommit.contains(s0));
-                                pr.setRefactoringType(r.getRefactoringType().getDisplayName());
-                                pr.setTdDifference(tdDiff);
-                                pr.setTdClass(ProcessResult.getTdClassFor(tdDiff));
-
-                                resultList.add(pr);
+                                actualAnalysis = sonarQubeWorker.getAnalysisFor(commitHashId);
+                                previousAnalysis = sonarQubeWorker.getAnalysisFor(previousCommitHashId);
+                                sonarQubeScanningAlreadyDone = true;
                             }
+
+                            tdDiff = sonarQubeWorker.extractTdFromComponent(previousAnalysis, r.leftSide().get(0).getFilePath())
+                                    - sonarQubeWorker.extractTdFromComponent(actualAnalysis, r.leftSide().get(0).getFilePath());
+
+                            pr.setTdDifference(tdDiff);
+                            pr.setTdClass(ProcessResult.getTdClassFor(tdDiff));
+
+                            boolean isSmellRemoved = r.leftSide() != null && r.leftSide().size() > 0
+                                    && !smellListActualCommit.contains(s0)
+                                    && isSamePathClass(getPackagesWithClassPath(r.leftSide().get(0).getFilePath()), generateSmellClassPath(s0.getPackageName(), s0.getClassName()))
+                                    && (s0.getMethodName() == null || isSameMethod(r.leftSide().get(0).getCodeElement(), s0.getMethodName()));
+
+                            pr.setSmellRemoved(isSmellRemoved);
+
+                            resultList.add(pr);
                         }
                     }
                 }
