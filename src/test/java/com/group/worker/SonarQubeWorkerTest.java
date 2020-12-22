@@ -1,13 +1,5 @@
 package com.group.worker;
 
-import java.io.IOException;
-
-import org.junit.jupiter.api.Test;
-
-import com.group.pojo.sonar.Analysis;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
 public class SonarQubeWorkerTest {
 
 	/*@Test
@@ -24,7 +16,7 @@ public class SonarQubeWorkerTest {
 		assert true;
 	}*/
 
-	@Test
+	/*@Test
 	void getAnalysisRequestTest() throws IOException {
 
 		Config conf = ConfigFactory.load();
@@ -37,5 +29,5 @@ public class SonarQubeWorkerTest {
 		
 		
 		assert true;
-	}
+	}*/
 }

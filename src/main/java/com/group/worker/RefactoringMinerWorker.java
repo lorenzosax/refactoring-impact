@@ -50,9 +50,8 @@ public class RefactoringMinerWorker {
         miner.detectAll(repo, branch, new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<org.refactoringminer.api.Refactoring> refactorings) {
-                List<org.refactoringminer.api.Refactoring> refactoringList = getFilteredRefactorings(refactorings);
-                if (refactoringList.size() > 0) {
-                    commitArrayList.add(new Commit(commitId, refactoringList));
+                if (refactorings.size() > 0) {
+                    commitArrayList.add(new Commit(commitId, refactorings));
                 }
             }
         });
@@ -69,9 +68,8 @@ public class RefactoringMinerWorker {
         miner.detectBetweenCommits(repo, startCommitId, endCommitId, new RefactoringHandler() {
             @Override
             public void handle(String commitId, List<org.refactoringminer.api.Refactoring> refactorings) {
-                List<org.refactoringminer.api.Refactoring> refactoringList = getFilteredRefactorings(refactorings);
-                if (refactoringList.size() > 0) {
-                    commitArrayList.add(new Commit(commitId, refactoringList));
+                if (refactorings.size() > 0) {
+                    commitArrayList.add(new Commit(commitId, refactorings));
                 }
             }
         });

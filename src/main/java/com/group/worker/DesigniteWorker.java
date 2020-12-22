@@ -27,7 +27,8 @@ public class DesigniteWorker {
         this.repoDir = repoDir;
         new ProcBuilder("mkdir")
                 .withWorkingDirectory(new File(resultsDir))
-                .withArg(DESIGNITE_RESULTS_FOLDER);
+                .withArg(DESIGNITE_RESULTS_FOLDER)
+                .run();
         this.resultsDir = resultsDir + "\\" + DESIGNITE_RESULTS_FOLDER + "\\";
     }
 
@@ -45,6 +46,7 @@ public class DesigniteWorker {
                 .withArg(repoDir)
                 .withArg("-o")
                 .withArg(outputPath)
+                .withNoTimeout()
                 .run();
         System.out.println("Designite Done!");
 
