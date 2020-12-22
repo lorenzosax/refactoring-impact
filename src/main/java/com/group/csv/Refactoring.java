@@ -4,7 +4,7 @@ import com.group.csv.annotation.CsvBindByNameOrder;
 import com.opencsv.bean.CsvBindByName;
 
 @CsvBindByNameOrder({"Commit","Refactoring Type","Description"})
-public class RefactoringCSV {
+public class Refactoring {
 
     @CsvBindByName(column = "Commit")
     private String commit;
@@ -13,7 +13,7 @@ public class RefactoringCSV {
     @CsvBindByName(column = "Description")
     private String description;
 
-    public RefactoringCSV(String commit, String refactoringType, String description) {
+    public Refactoring(String commit, String refactoringType, String description) {
         this.commit = commit;
         this.refactoringType = refactoringType;
         this.description = description;

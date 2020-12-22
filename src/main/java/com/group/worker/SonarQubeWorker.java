@@ -1,11 +1,18 @@
 package com.group.worker;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.StringTokenizer;
+
+import com.group.pojo.sonar.Component;
+import com.group.pojo.sonar.Measure;
+import org.buildobjects.process.ProcBuilder;
 
 import com.google.gson.Gson;
 import com.group.pojo.sonar.Analysis;
@@ -14,10 +21,33 @@ public class SonarQubeWorker {
 
 	private static final String USER_AGENT = "Mozilla/5.0";
 
-	private static final String uriApi = "http://localhost:9000/api/measures/component_tree?component=moneytransfer45864560&metricKeys=sqale_index&qualifiers=FIL&ps=500&pageIndex=";
+	private static final String COMPONENT_TREE_API = "/api/measures/component_tree?component=";
+	private static final String PARAMETERS = "&metricKeys=sqale_index&qualifiers=FIL&ps=500&pageIndex=";
 
-	private static void sendGET() throws IOException {
-		URL obj = new URL(uriApi);
+	private String baseUrl;
+	private String sonarScannerDir;
+	private String repoDir;
+	private String project;
+
+	public SonarQubeWorker(String sonarQubeServerBaseUrl, String sonarScannerDir, String repoDir) {
+		this.baseUrl = sonarQubeServerBaseUrl;
+		this.sonarScannerDir = sonarScannerDir;
+		this.repoDir = repoDir;
+		StringTokenizer stringTokenizer = new StringTokenizer(repoDir, "\\\\");
+		while (stringTokenizer.hasMoreElements())
+			this.project = stringTokenizer.nextToken();
+	}
+
+	public Analysis getAnalysisFor(String commitHash) throws IOException {
+
+		String projectSonar = this.project.concat("_").concat(commitHash);
+
+		return new Gson().fromJson(httpGetRequest(projectSonar).toString(), Analysis.class);
+
+	}
+
+	private StringBuffer httpGetRequest(String projectSonar) throws IOException {
+		URL obj = new URL(this.baseUrl + COMPONENT_TREE_API + projectSonar + PARAMETERS);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
 		con.setRequestProperty("User-Agent", USER_AGENT);
@@ -34,13 +64,60 @@ public class SonarQubeWorker {
 			}
 			in.close();
 
-			Analysis an = new Gson().fromJson(response.toString(), Analysis.class);
-			
-			System.out.println(an.toString());
+			return response;
 		} else {
 			System.out.println("GET request not worked");
 		}
-
+		return null;
 	}
 
+	public void executeScanning(String commitHashId) {
+		System.out.println("Run Sonar Scanner...");
+		generatePropertiesFile(commitHashId);
+		new ProcBuilder("cmd").withWorkingDirectory(new File(this.repoDir)).withArg("/c")
+				.withArg(this.sonarScannerDir + "\\sonar-scanner.bat").withNoTimeout().run();
+		System.out.println("Sona Scanner Done!");
+	}
+
+	public Integer extractTdFromComponent(Analysis analysis, String classPath) {
+		if (analysis != null) {
+			for (Component c : analysis.getComponents()) {
+				if (c.getPath().equals(classPath)) {
+					for (Measure m : c.getMeasures()) {
+						if (m.getMetric().equals("sqale_index")) {
+							return Integer.parseInt(m.getValue());
+						}
+					}
+				}
+			}
+		}
+		return 0;
+	}
+
+	private void generatePropertiesFile(String commitHashId) {
+
+		try {
+			BufferedWriter writer = new BufferedWriter(
+					new FileWriter(this.repoDir + "\\sonar-project.properties", false));
+			writer.append("sonar.projectKey=");
+			writer.append(this.project);
+			writer.append("_");
+			writer.append(commitHashId);
+			writer.append("\n");
+			writer.append("sonar.projectName=");
+			writer.append(this.project);
+			writer.append("_");
+			writer.append(commitHashId);
+			writer.append("\n");
+			writer.append("sonar.sources=src");
+			writer.append("\n");
+			writer.append("sonar.java.binaries=.");
+			writer.append("\n");
+			writer.append("sonar.scm.disabled=true");
+
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

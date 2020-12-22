@@ -1,15 +1,13 @@
 package com.group.worker;
 
+import com.group.Utils;
 import com.group.csv.CSVService;
-import com.group.csv.RefactoringCSV;
+import com.group.csv.Refactoring;
 import com.group.pojo.InfoCommit;
 import org.buildobjects.process.ProcBuilder;
 import org.buildobjects.process.ProcResult;
 import org.eclipse.jgit.lib.Repository;
-import org.refactoringminer.api.GitHistoryRefactoringMiner;
-import org.refactoringminer.api.GitService;
-import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringHandler;
+import org.refactoringminer.api.*;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
 import com.group.pojo.Commit;
@@ -51,9 +49,10 @@ public class RefactoringMinerWorker {
         ArrayList<Commit> commitArrayList = new ArrayList<>();
         miner.detectAll(repo, branch, new RefactoringHandler() {
             @Override
-            public void handle(String commitId, List<Refactoring> refactorings) {
-                if (refactorings.size() > 0) {
-                    commitArrayList.add(new Commit(commitId, refactorings));
+            public void handle(String commitId, List<org.refactoringminer.api.Refactoring> refactorings) {
+                List<org.refactoringminer.api.Refactoring> refactoringList = getFilteredRefactorings(refactorings);
+                if (refactoringList.size() > 0) {
+                    commitArrayList.add(new Commit(commitId, refactoringList));
                 }
             }
         });
@@ -69,9 +68,10 @@ public class RefactoringMinerWorker {
         ArrayList<Commit> commitArrayList = new ArrayList<>();
         miner.detectBetweenCommits(repo, startCommitId, endCommitId, new RefactoringHandler() {
             @Override
-            public void handle(String commitId, List<Refactoring> refactorings) {
-                if (refactorings.size() > 0) {
-                    commitArrayList.add(new Commit(commitId, refactorings));
+            public void handle(String commitId, List<org.refactoringminer.api.Refactoring> refactorings) {
+                List<org.refactoringminer.api.Refactoring> refactoringList = getFilteredRefactorings(refactorings);
+                if (refactoringList.size() > 0) {
+                    commitArrayList.add(new Commit(commitId, refactoringList));
                 }
             }
         });
@@ -146,11 +146,11 @@ public class RefactoringMinerWorker {
 
     private void parseCommitArrayListAndWriteOnFile(List<Commit> commitList) {
         System.out.println("Generating " + REFACTORING_TYPE_FOUND_FILENAME);
-        List<RefactoringCSV> refactoringList = new ArrayList<RefactoringCSV>();
+        List<Refactoring> refactoringList = new ArrayList<Refactoring>();
         for (Commit c : commitList) {
-            for (Refactoring r : c.getRefactoringList()) {
+            for (org.refactoringminer.api.Refactoring r : c.getRefactoringList()) {
                 refactoringList.add(
-                        new RefactoringCSV(
+                        new Refactoring(
                                 c.getHash(),
                                 r.getRefactoringType().getDisplayName(),
                                 r.toString().replace('\t', ' '))
@@ -160,6 +160,16 @@ public class RefactoringMinerWorker {
         CSVService.writeCsvFile(
                 resultsDir + "\\" + REFACTORING_TYPE_FOUND_FILENAME,
                 refactoringList,
-                RefactoringCSV.class);
+                Refactoring.class);
+    }
+
+    private List<org.refactoringminer.api.Refactoring> getFilteredRefactorings(List<org.refactoringminer.api.Refactoring> refactorings) {
+        List<org.refactoringminer.api.Refactoring> refactoringList = new ArrayList<>();
+        for (org.refactoringminer.api.Refactoring r : refactorings) {
+            if (Utils.refactoringsConsidered.containsKey(r.getRefactoringType())) {
+                refactoringList.add(r);
+            }
+        }
+        return refactoringList;
     }
 }
