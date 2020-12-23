@@ -5,6 +5,7 @@ import org.refactoringminer.api.RefactoringType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utils {
@@ -41,8 +42,8 @@ public class Utils {
         put(RefactoringType.EXTRACT_INTERFACE, true);
     }};
 
-    static final Pattern srcMainJavaPattern = Pattern.compile("^src/(main|test)/java/(.*)");
-    static final Pattern srcPattern = Pattern.compile("^src/(.*)");
+    public static final Pattern srcMainJavaPattern = Pattern.compile("^src/(main|test)/java/(.*)");
+    public static final Pattern srcPattern = Pattern.compile("^src/(.*)");
 
     public static String preparePathOsBased(boolean withLastSlash, String... subPaths) {
         StringBuilder path = new StringBuilder();
@@ -62,6 +63,19 @@ public class Utils {
         while (stringTokenizer.hasMoreElements())
             projectName = stringTokenizer.nextToken();
         return projectName;
+    }
+
+    public static String getPackagesWithClassPath(String filepath) {
+
+        Matcher srcMainJavaMatcher = Utils.srcMainJavaPattern.matcher(filepath);
+        Matcher scrMatcher = Utils.srcPattern.matcher(filepath);
+
+        if(srcMainJavaMatcher.find()) {
+            return srcMainJavaMatcher.group(2);
+        } else if (scrMatcher.find()){
+            return scrMatcher.group(1);
+        }
+        return filepath;
     }
 
 }

@@ -105,15 +105,16 @@ public class Process {
                                 sonarQubeScanningAlreadyDone = true;
                             }
 
-                            tdDiff = sonarQubeWorker.extractTdFromComponent(previousAnalysis, r.leftSide().get(0).getFilePath())
-                                    - sonarQubeWorker.extractTdFromComponent(actualAnalysis, r.leftSide().get(0).getFilePath());
+                            String smellClassPath = generateSmellClassPath(s0.getPackageName(), s0.getClassName());
+                            tdDiff = sonarQubeWorker.extractTdFromComponent(previousAnalysis, smellClassPath)
+                                    - sonarQubeWorker.extractTdFromComponent(actualAnalysis, smellClassPath);
 
                             pr.setTdDifference(tdDiff);
                             pr.setTdClass(ProcessResult.getTdClassFor(tdDiff));
 
                             boolean isSmellRemoved = r.leftSide() != null && r.leftSide().size() > 0
                                     && !smellListActualCommit.contains(s0)
-                                    && isSamePathClass(getPackagesWithClassPath(r.leftSide().get(0).getFilePath()), generateSmellClassPath(s0.getPackageName(), s0.getClassName()))
+                                    && isSamePathClass(Utils.getPackagesWithClassPath(r.leftSide().get(0).getFilePath()), smellClassPath)
                                     && (s0.getMethodName() == null || isSameMethod(r.leftSide().get(0).getCodeElement(), s0.getMethodName()));
 
                             pr.setSmellRemoved(isSmellRemoved);
@@ -148,19 +149,6 @@ public class Process {
             method = stSpace.nextToken();
 
         return method.equals(smellMethodName);
-    }
-
-    public static String getPackagesWithClassPath(String filepath) {
-
-        Matcher srcMainJavaMatcher = Utils.srcMainJavaPattern.matcher(filepath);
-        Matcher scrMatcher = Utils.srcPattern.matcher(filepath);
-
-        if(srcMainJavaMatcher.find()) {
-            return srcMainJavaMatcher.group(2);
-        } else if (scrMatcher.find()){
-            return scrMatcher.group(1);
-        }
-        return filepath;
     }
 
     public static String generateSmellClassPath(String pkg, String className) {

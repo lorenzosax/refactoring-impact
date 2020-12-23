@@ -88,7 +88,7 @@ public class SonarQubeWorker {
 	public Integer extractTdFromComponent(Analysis analysis, String classPath) {
 		if (analysis != null) {
 			for (Component c : analysis.getComponents()) {
-				if (c.getPath().equals(classPath)) {
+				if (Utils.getPackagesWithClassPath(c.getPath()).equals(classPath)) {
 					for (Measure m : c.getMeasures()) {
 						if (m.getMetric().equals("sqale_index")) {
 							return Integer.parseInt(m.getValue());
