@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Objects;
-import java.util.StringTokenizer;
 
+import com.group.Utils;
 import com.group.pojo.sonar.Component;
 import com.group.pojo.sonar.Measure;
 import org.apache.log4j.Logger;
@@ -37,9 +37,7 @@ public class SonarQubeWorker {
 		this.baseUrl = sonarQubeServerBaseUrl;
 		this.sonarScannerDir = sonarScannerDir;
 		this.repoDir = repoDir;
-		StringTokenizer stringTokenizer = new StringTokenizer(repoDir, "\\\\");
-		while (stringTokenizer.hasMoreElements())
-			this.project = stringTokenizer.nextToken();
+		this.project = Utils.getProjectNameFromRepoDir(this.repoDir);
 	}
 
 	public Analysis getAnalysisFor(String commitHash) throws IOException {
@@ -81,7 +79,7 @@ public class SonarQubeWorker {
 		new ProcBuilder("cmd")
 				.withWorkingDirectory(new File(this.repoDir))
 				.withArg("/c")
-				.withArg(this.sonarScannerDir + "\\sonar-scanner.bat")
+				.withArg(Utils.preparePathOsBased(false, this.sonarScannerDir, "sonar-scanner.bat"))
 				.withNoTimeout()
 				.run();
 		logger.info("Sona Scanner Done!");
@@ -106,7 +104,7 @@ public class SonarQubeWorker {
 
 		try {
 			BufferedWriter writer = new BufferedWriter(
-					new FileWriter(this.repoDir + "\\sonar-project.properties", false));
+					new FileWriter(Utils.preparePathOsBased(false, this.repoDir, "sonar-project.properties"), false));
 			writer.append("sonar.projectKey=");
 			writer.append(this.project);
 			writer.append("_");

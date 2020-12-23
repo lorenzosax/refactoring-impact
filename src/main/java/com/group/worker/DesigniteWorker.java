@@ -28,14 +28,14 @@ public class DesigniteWorker {
     public DesigniteWorker(String designiteDir, String repoDir, String resultsDir){
         this.designiteDir = designiteDir;
         this.repoDir = repoDir;
-        this.resultsDir = resultsDir + "\\" + DESIGNITE_RESULTS_FOLDER + "\\";
+        this.resultsDir = Utils.preparePathOsBased(true, resultsDir, DESIGNITE_RESULTS_FOLDER);
     }
 
     public List<Smell> execute(String folderName) {
 
         logger.info("Run Designite...");
 
-        String outputPath = this.resultsDir + System.currentTimeMillis() + "_" + folderName + "\\";
+        String outputPath = Utils.preparePathOsBased(true, this.resultsDir, System.currentTimeMillis() + "_" + folderName);
 
         new ProcBuilder("java")
                 .withWorkingDirectory(new File(designiteDir))

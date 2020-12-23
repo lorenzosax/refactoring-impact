@@ -126,7 +126,7 @@ public class Process {
             logger.info("-----------------------------------------");
         }
         logger.info("Generating " + RESULTS_PROCESS_FILENAME);
-        CSVService.writeCsvFileWithStrategy(resultsDir + "\\" + RESULTS_PROCESS_FILENAME, resultList, ProcessResult.class);
+        CSVService.writeCsvFileWithStrategy(Utils.preparePathOsBased(false, resultsDir, RESULTS_PROCESS_FILENAME), resultList, ProcessResult.class);
         logger.info("Process finished!");
     }
 
