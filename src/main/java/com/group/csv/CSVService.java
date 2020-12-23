@@ -3,6 +3,7 @@ package com.group.csv;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.*;
 import com.group.csv.strategy.HeaderColumnNameAndOrderMappingStrategy;
+import org.apache.log4j.Logger;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CSVService {
+
+    private static final Logger logger = Logger.getLogger(CSVService.class);
 
     public static <T> List readCsvFile(String filename, Class<T> clazz) {
         List<T> csvSmellList = new ArrayList<>();
@@ -26,7 +29,7 @@ public class CSVService {
             csvSmellList = csvToBean.parse();
             reader.close();
         } catch (Exception e) {
-            System.err.println(e);
+            logger.error(e);
         }
         return csvSmellList;
     }
@@ -45,7 +48,7 @@ public class CSVService {
             writer.close();
             return true;
         } catch (Exception e) {
-            System.err.println(e);
+            logger.error(e);
         }
         return false;
     }
@@ -67,7 +70,7 @@ public class CSVService {
             writer.close();
             return true;
         } catch (Exception e) {
-            System.err.println(e);
+            logger.error(e);
         }
         return false;
     }

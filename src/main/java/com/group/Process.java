@@ -17,8 +17,11 @@ import com.group.worker.RefactoringMinerWorker;
 import com.group.worker.SonarQubeWorker;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringType;
+import org.apache.log4j.Logger;
 
 public class Process {
+
+    private static final Logger logger = Logger.getLogger(Process.class);
 
     static final String RESULTS_PROCESS_FILENAME = "datasets.csv";
 
@@ -48,7 +51,7 @@ public class Process {
         DesigniteWorker designiteWorker = new DesigniteWorker(designiteDir, repoDir, resultsDir);
         SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeServerBaseUrl, sonarQubeScannerBinDir,repoDir);
 
-        System.out.println("<Start process>");
+        logger.info("<Start process>");
 
         ArrayList<Commit> commitList;
         if (refactoringMinerDetectBetweenCommits) {
@@ -117,11 +120,11 @@ public class Process {
                     }
                 }
             }
-            System.out.println("-----------------------------------------");
+            logger.info("-----------------------------------------");
         }
-        System.out.println("Generating " + RESULTS_PROCESS_FILENAME);
+        logger.info("Generating " + RESULTS_PROCESS_FILENAME);
         CSVService.writeCsvFile(resultsDir + "\\" + RESULTS_PROCESS_FILENAME, resultList, ProcessResult.class);
-        System.out.println("Process finished!");
+        logger.info("Process finished!");
     }
 
     public static boolean isAdmissibleRefactoringType(RefactoringType refType, String codeSmell) {

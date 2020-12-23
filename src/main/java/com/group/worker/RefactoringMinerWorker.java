@@ -4,6 +4,7 @@ import com.group.Utils;
 import com.group.csv.CSVService;
 import com.group.csv.Refactoring;
 import com.group.pojo.InfoCommit;
+import org.apache.log4j.Logger;
 import org.buildobjects.process.ProcBuilder;
 import org.buildobjects.process.ProcResult;
 import org.eclipse.jgit.lib.Repository;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 
 public class RefactoringMinerWorker {
 
+    private static final Logger logger = Logger.getLogger(RefactoringMinerWorker.class);
     private static final String REFACTORING_TYPE_FOUND_FILENAME = "refactoringFound.csv";
 
     private GitService gitService = new GitServiceImpl();
@@ -45,7 +47,7 @@ public class RefactoringMinerWorker {
     }
 
     public ArrayList<Commit> getRefactoringsForCommits(String branch) throws Exception {
-        System.out.println("Run Refactoring Miner...");
+        logger.info("Run Refactoring Miner...");
         ArrayList<Commit> commitArrayList = new ArrayList<>();
         miner.detectAll(repo, branch, new RefactoringHandler() {
             @Override
@@ -55,7 +57,7 @@ public class RefactoringMinerWorker {
                 }
             }
         });
-        System.out.println("Refactoring Miner Done!");
+        logger.info("Refactoring Miner Done!");
         if (this.writeOutputOnFile) {
             parseCommitArrayListAndWriteOnFile(commitArrayList);
         }
@@ -63,7 +65,7 @@ public class RefactoringMinerWorker {
     }
 
     public ArrayList<Commit> getRefactoringsForCommitsWithRange(String startCommitId, String endCommitId) throws Exception {
-        System.out.println("Run Refactoring Miner with detection between commits...");
+        logger.info("Run Refactoring Miner with detection between commits...");
         ArrayList<Commit> commitArrayList = new ArrayList<>();
         miner.detectBetweenCommits(repo, startCommitId, endCommitId, new RefactoringHandler() {
             @Override
@@ -73,7 +75,7 @@ public class RefactoringMinerWorker {
                 }
             }
         });
-        System.out.println("Refactoring Miner Done!");
+        logger.info("Refactoring Miner Done!");
         if (this.writeOutputOnFile) {
             parseCommitArrayListAndWriteOnFile(commitArrayList);
         }
@@ -82,7 +84,7 @@ public class RefactoringMinerWorker {
 
     public String checkoutPreviousCommit(String commitHashId) {
 
-        System.out.println("Commit Hash: " + commitHashId);
+        logger.info("Commit Hash: " + commitHashId);
 
         ProcResult result = new ProcBuilder("git")
                 .withWorkingDirectory(new File(repo.getDirectory().getParent()))
@@ -104,7 +106,7 @@ public class RefactoringMinerWorker {
             return previousCommit;
         }
 
-        System.out.println("Previous Commit hash not found: " + commitHashId);
+        logger.info("Previous Commit hash not found: " + commitHashId);
         return null;
     }
 
@@ -117,7 +119,7 @@ public class RefactoringMinerWorker {
                 .withNoTimeout()
                 .run();
 
-        System.out.println("Checkout to commit hash: " + commitHashId);
+        logger.info("Checkout to commit hash: " + commitHashId);
         return true;
     }
 
@@ -146,7 +148,7 @@ public class RefactoringMinerWorker {
     }
 
     private void parseCommitArrayListAndWriteOnFile(List<Commit> commitList) {
-        System.out.println("Generating " + REFACTORING_TYPE_FOUND_FILENAME);
+        logger.info("Generating " + REFACTORING_TYPE_FOUND_FILENAME);
         List<Refactoring> refactoringList = new ArrayList<Refactoring>();
         for (Commit c : commitList) {
             for (org.refactoringminer.api.Refactoring r : c.getRefactoringList()) {
