@@ -61,7 +61,10 @@ public class Process {
             commitList = refactoringMinerWorker.getRefactoringsForCommits(branchName);
         }
 
+        int commitNumber = 1;
         for (Commit commit : commitList) {
+
+            logger.info("Commit " + commitNumber++ + ")");
 
             String commitHashId = commit.getHash();
             String previousCommitHashId = refactoringMinerWorker.checkoutPreviousCommit(commitHashId);
@@ -123,7 +126,7 @@ public class Process {
             logger.info("-----------------------------------------");
         }
         logger.info("Generating " + RESULTS_PROCESS_FILENAME);
-        CSVService.writeCsvFile(resultsDir + "\\" + RESULTS_PROCESS_FILENAME, resultList, ProcessResult.class);
+        CSVService.writeCsvFileWithStrategy(resultsDir + "\\" + RESULTS_PROCESS_FILENAME, resultList, ProcessResult.class);
         logger.info("Process finished!");
     }
 

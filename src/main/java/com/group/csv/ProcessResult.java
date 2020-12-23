@@ -3,30 +3,30 @@ package com.group.csv;
 import com.group.csv.annotation.CsvBindByNameOrder;
 import com.opencsv.bean.CsvBindByName;
 
-@CsvBindByNameOrder({"Commit","Committer Name","Committer Email","Class","Method","Refactoring Type","Smell Type","TD difference","TD Class","Smell Removed"})
+@CsvBindByNameOrder({"commit","committer_name","committer_email","class","method","refactoring_type","smell_type","td_difference","td_class","smell_removed"})
 public class ProcessResult {
 
     public enum TD_CLASS { IMPROVED, STABLE, PEJORATIVE};
 
-    @CsvBindByName(column = "Commit")
+    @CsvBindByName(column = "commit")
     private String commitHash;
-    @CsvBindByName(column = "Committer Name")
+    @CsvBindByName(column = "committer_name")
     private String committerName;
-    @CsvBindByName(column = "Committer Email")
+    @CsvBindByName(column = "committer_email")
     private String committerEmail;
-    @CsvBindByName(column = "Class")
+    @CsvBindByName(column = "class")
     private String className;
-    @CsvBindByName(column = "Method")
+    @CsvBindByName(column = "method")
     private String methodName;
-    @CsvBindByName(column = "Refactoring Type")
+    @CsvBindByName(column = "refactoring_type")
     private String refactoringType;
-    @CsvBindByName(column = "Smell Type")
+    @CsvBindByName(column = "smell_type")
     private String smellType;
-    @CsvBindByName(column = "TD difference")
+    @CsvBindByName(column = "td_difference")
     private Integer tdDifference;
-    @CsvBindByName(column = "TD Class")
+    @CsvBindByName(column = "td_class")
     private TD_CLASS tdClass;
-    @CsvBindByName(column = "Smell Removed")
+    @CsvBindByName(column = "smell_removed")
     private boolean isSmellRemoved;
 
     public ProcessResult() {
