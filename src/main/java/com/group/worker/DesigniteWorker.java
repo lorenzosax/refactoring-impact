@@ -5,6 +5,7 @@ import com.group.csv.DesignSmell;
 import com.group.csv.ImplementationSmell;
 import com.group.csv.CSVService;
 import com.group.csv.Smell;
+import org.apache.log4j.Logger;
 import org.buildobjects.process.ProcBuilder;
 
 import java.io.*;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DesigniteWorker {
+
+    private static final Logger logger = Logger.getLogger(DesigniteWorker.class);
 
     private static final String DESIGNITE_RESULTS_FOLDER = "designiteResults";
     private static final String DESIGN_CODE_SMELLS_FILENAME = "designCodeSmells.csv";
@@ -30,7 +33,7 @@ public class DesigniteWorker {
 
     public List<Smell> execute(String folderName) {
 
-        System.out.println("Run Designite...");
+        logger.info("Run Designite...");
 
         String outputPath = this.resultsDir + System.currentTimeMillis() + "_" + folderName + "\\";
 
@@ -44,12 +47,12 @@ public class DesigniteWorker {
                 .withArg(outputPath)
                 .withNoTimeout()
                 .run();
-        System.out.println("Designite Done!");
+        logger.info("Designite Done!");
 
-        System.out.println("Read " + DESIGN_CODE_SMELLS_FILENAME);
+        logger.info("Read " + DESIGN_CODE_SMELLS_FILENAME);
         List<DesignSmell> designSmellList = CSVService.readCsvFile(
                 outputPath + DESIGN_CODE_SMELLS_FILENAME, DesignSmell.class);
-        System.out.println("Read " + IMPLEMENTATION_CODE_SMELLS_FILENAME);
+        logger.info("Read " + IMPLEMENTATION_CODE_SMELLS_FILENAME);
         List<ImplementationSmell> implementationSmellList = CSVService.readCsvFile(
                 outputPath + IMPLEMENTATION_CODE_SMELLS_FILENAME,
                 ImplementationSmell.class);
@@ -81,7 +84,7 @@ public class DesigniteWorker {
             }
         }
 
-        System.out.println("Generating " + FILTERED_SMELLS_FILENAME);
+        logger.info("Generating " + FILTERED_SMELLS_FILENAME);
         CSVService.writeCsvFileWithStrategy(outputPath + FILTERED_SMELLS_FILENAME, smellList, Smell.class);
 
         return smellList;

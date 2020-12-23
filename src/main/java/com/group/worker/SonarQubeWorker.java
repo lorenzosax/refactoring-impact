@@ -8,16 +8,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 import com.group.pojo.sonar.Component;
 import com.group.pojo.sonar.Measure;
+import org.apache.log4j.Logger;
 import org.buildobjects.process.ProcBuilder;
 
 import com.google.gson.Gson;
 import com.group.pojo.sonar.Analysis;
 
 public class SonarQubeWorker {
+
+	private static final Logger logger = Logger.getLogger(SonarQubeWorker.class);
 
 	private static final String USER_AGENT = "Mozilla/5.0";
 
@@ -42,7 +46,7 @@ public class SonarQubeWorker {
 
 		String projectSonar = this.project.concat("_").concat(commitHash);
 
-		return new Gson().fromJson(httpGetRequest(projectSonar).toString(), Analysis.class);
+		return new Gson().fromJson(Objects.requireNonNull(httpGetRequest(projectSonar)).toString(), Analysis.class);
 
 	}
 
@@ -52,7 +56,7 @@ public class SonarQubeWorker {
 		con.setRequestMethod("GET");
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		int responseCode = con.getResponseCode();
-		System.out.println("GET Response Code :: " + responseCode);
+		logger.info("GET Response Code :: " + responseCode + " for " + projectSonar);
 
 		if (responseCode == HttpURLConnection.HTTP_OK) { // success
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -66,17 +70,21 @@ public class SonarQubeWorker {
 
 			return response;
 		} else {
-			System.out.println("GET request not worked");
+			logger.info("GET request not worked for " + projectSonar);
 		}
 		return null;
 	}
 
 	public void executeScanning(String commitHashId) {
-		System.out.println("Run Sonar Scanner...");
+		logger.info("Run Sonar Scanner...");
 		generatePropertiesFile(commitHashId);
-		new ProcBuilder("cmd").withWorkingDirectory(new File(this.repoDir)).withArg("/c")
-				.withArg(this.sonarScannerDir + "\\sonar-scanner.bat").withNoTimeout().run();
-		System.out.println("Sona Scanner Done!");
+		new ProcBuilder("cmd")
+				.withWorkingDirectory(new File(this.repoDir))
+				.withArg("/c")
+				.withArg(this.sonarScannerDir + "\\sonar-scanner.bat")
+				.withNoTimeout()
+				.run();
+		logger.info("Sona Scanner Done!");
 	}
 
 	public Integer extractTdFromComponent(Analysis analysis, String classPath) {
