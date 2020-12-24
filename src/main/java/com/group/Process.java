@@ -80,12 +80,12 @@ public class Process {
             commitList = refactoringMinerWorker.getRefactoringsForCommits(branchName);
         }
 
-        int commitNumber = 1;
+        int commitNumber = 1, totalCommits = commitList.size();
 
         // Loop on all commits that contains refactorings
         for (Commit commit : commitList) {
 
-            logger.info("Commit " + commitNumber++ + ")");
+            logger.info("Commit " + commitNumber++ + "/" + totalCommits + ")");
 
             String commitHashId = commit.getHash();
             String previousCommitHashId = refactoringMinerWorker.checkoutPreviousCommit(commitHashId);
