@@ -80,7 +80,5 @@ public class Component {
 		return "Component [id=" + id + ", key=" + key + ", name=" + name + ", qualifier=" + qualifier + ", path=" + path
 				+ ", language=" + language + ", measures=" + measures + "]";
 	}
-	
-	
 
 }

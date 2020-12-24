@@ -1,6 +1,5 @@
 package com.group.pojo.sonar;
 
-
 import java.util.ArrayList;
 
 public class Analysis {
@@ -39,6 +38,5 @@ public class Analysis {
 	public void setComponents(ArrayList<Component> components) {
 		this.components = components;
 	}
-	
 
 }

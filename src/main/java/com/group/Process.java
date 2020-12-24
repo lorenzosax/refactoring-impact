@@ -2,7 +2,6 @@ package com.group;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import com.group.csv.CSVService;
@@ -15,7 +14,6 @@ import com.group.worker.DesigniteWorker;
 import com.group.worker.RefactoringMinerWorker;
 import com.group.worker.SonarQubeWorker;
 import org.refactoringminer.api.Refactoring;
-import org.refactoringminer.api.RefactoringType;
 import org.apache.log4j.Logger;
 
 public class Process {
@@ -58,6 +56,13 @@ public class Process {
                 false);
     }
 
+    /**
+     * Start process to analyze a project and match code smells with refactoring
+     * and associate class tech debts. Results will be write on CSV in the folder
+     * specified in configuration file (application.conf)
+     *
+     * @see ProcessResult
+     */
     public void start() throws Exception {
 
         RefactoringMinerWorker refactoringMinerWorker =
@@ -76,6 +81,8 @@ public class Process {
         }
 
         int commitNumber = 1;
+
+        // Loop on all commits that contains refactorings
         for (Commit commit : commitList) {
 
             logger.info("Commit " + commitNumber++ + ")");
@@ -83,22 +90,30 @@ public class Process {
             String commitHashId = commit.getHash();
             String previousCommitHashId = refactoringMinerWorker.checkoutPreviousCommit(commitHashId);
 
+            // if present previous commit do analysis
             if (previousCommitHashId != null) {
 
+                // Get smell list of previous commit
                 List<Smell> smellListPreviousCommit = designiteWorker.execute(previousCommitHashId);
 
+                // if designite return at least 1 smell do analysis
                 if (smellListPreviousCommit.size() > 0) {
 
                     refactoringMinerWorker.checkoutToCommit(commitHashId);
                     InfoCommit infoCommit = refactoringMinerWorker.getInformationCommit(commitHashId);
+
+                    // Get smell list of current commit
                     List<Smell> smellListActualCommit = designiteWorker.execute(commitHashId);
 
                     boolean sonarQubeScanningAlreadyDone = false;
                     Integer tdDiff;
                     Analysis actualAnalysis = null, previousAnalysis = null;
+
+                    // for each previous smell considerate all refactoring of current commit
                     for (Smell s0 : smellListPreviousCommit) {
                         for (Refactoring r : commit.getRefactoringList()) {
 
+                            // Prepare new entry for results
                             ProcessResult pr = new ProcessResult();
                             pr.setCommitHash(commitHashId);
                             pr.setClassName(s0.getClassName());
@@ -109,23 +124,31 @@ public class Process {
                             pr.setSmellRemoved(!smellListActualCommit.contains(s0));
                             pr.setRefactoringType(r.getRefactoringType().getDisplayName());
 
+                            // to avoid throwing multiple times SonarQubeScanner check
+                            // if already done for current and previous commit
                             if (!sonarQubeScanningAlreadyDone) {
                                 sonarQubeWorker.executeScanning(commitHashId);
                                 refactoringMinerWorker.checkoutToCommit(previousCommitHashId);
                                 sonarQubeWorker.executeScanning(previousCommitHashId);
 
+                                // retrieve analysis from SonarQube Server
                                 actualAnalysis = sonarQubeWorker.getAnalysisFor(commitHashId);
                                 previousAnalysis = sonarQubeWorker.getAnalysisFor(previousCommitHashId);
                                 sonarQubeScanningAlreadyDone = true;
                             }
 
                             String smellClassPath = generateSmellClassPath(s0.getPackageName(), s0.getClassName());
+
                             tdDiff = sonarQubeWorker.extractTdFromComponent(previousAnalysis, smellClassPath)
                                     - sonarQubeWorker.extractTdFromComponent(actualAnalysis, smellClassPath);
 
                             pr.setTdDifference(tdDiff);
                             pr.setTdClass(ProcessResult.getTdClassFor(tdDiff));
 
+                            // Check if smell was removed, three conditions:
+                            // - actual smell list not contain previous smell
+                            // - actual smell has same class path of the refactoring class path
+                            // - actual smell hasn't method name OR have same method name with method under refactoring
                             boolean isSmellRemoved = r.leftSide() != null && r.leftSide().size() > 0
                                     && !smellListActualCommit.contains(s0)
                                     && isSamePathClass(Utils.getPackagesWithClassPath(r.leftSide().get(0).getFilePath()), smellClassPath)
@@ -139,6 +162,8 @@ public class Process {
                 }
             }
             logger.info("-----------------------------------------");
+
+            // Save result list in csv file each 5 commit analyzed
             if (commitNumber % 5 == 0) {
                 logger.info("Updating " + RESULTS_PROCESS_FILENAME);
                 CSVService.writeCsvFileWithStrategy(Utils.preparePathOsBased(false, resultsDir, RESULTS_PROCESS_FILENAME), resultList, ProcessResult.class,false, true);
@@ -150,11 +175,25 @@ public class Process {
         logger.info("Process finished!");
     }
 
-    public static boolean isSamePathClass(String refClassFilePath, String smellClassFilePath) {
+    /**
+     * Check if two given string contain filepath are the same
+     *
+     * @param  refClassFilePath     refactoring class filepath
+     * @param  smellClassFilePath   smell class filepath
+     * @return true if the path are equals
+     */
+    private static boolean isSamePathClass(String refClassFilePath, String smellClassFilePath) {
         return refClassFilePath.equals(smellClassFilePath);
     }
 
-    public static boolean isSameMethod(String refMethodName, String smellMethodName) {
+    /**
+     * Check if two method are the same
+     *
+     * @param  refMethodName     refactoring method name
+     * @param  smellMethodName   smell method name
+     * @return a boolean value
+     */
+    private static boolean isSameMethod(String refMethodName, String smellMethodName) {
         StringTokenizer st = new StringTokenizer(refMethodName, "(");
         String method = st.nextToken();
 
@@ -165,7 +204,15 @@ public class Process {
         return method.equals(smellMethodName);
     }
 
-    public static String generateSmellClassPath(String pkg, String className) {
+    /**
+     * Given the package string and the class string, generate smell class filepath.
+     * If pkg contains packages with dot then replace with /.
+     *
+     * @param  pkg          a String with packages
+     * @param  className    a String with class name
+     * @return a string contain the path of the class with packages
+     */
+    private static String generateSmellClassPath(String pkg, String className) {
         pkg = pkg.replace(".", "/");
         return pkg.contains(" ") ?
                 className.concat(".java")
