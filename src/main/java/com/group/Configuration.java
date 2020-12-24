@@ -19,6 +19,7 @@ public class Configuration {
     private final String resultsDir;
 
     private final boolean isWindowsSystem;
+    private final String currentShell;
 
     private Configuration() {
         Config conf = ConfigFactory.load();
@@ -33,7 +34,8 @@ public class Configuration {
         sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
         resultsDir = conf.getString("results.dir");
 
-        this.isWindowsSystem = StringUtils.containsIgnoreCase(conf.getString("os.name"), "windows");
+        isWindowsSystem = StringUtils.containsIgnoreCase(conf.getString("os.name"), "windows");
+        currentShell = isWindowsSystem ? "cmd" : "bash";
     }
 
     public static Configuration getInstance() {
@@ -82,5 +84,9 @@ public class Configuration {
 
     public boolean isWindowsSystem() {
         return isWindowsSystem;
+    }
+
+    public String getCurrentShell() {
+        return currentShell;
     }
 }

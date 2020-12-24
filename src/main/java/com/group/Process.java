@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
 
 import com.group.csv.CSVService;
 import com.group.csv.Smell;
@@ -25,26 +24,41 @@ public class Process {
 
     static final String RESULTS_PROCESS_FILENAME = "datasets.csv";
 
+    private final String repoDir;
+    private final String branchName;
+    private final boolean refactoringMinerDetectBetweenCommits;
+    private final String refactoringMinerStartCommitId;
+    private final String refactoringMinerEndCommitId;
+    private final boolean writeRefactoringMinerOutputOnFile;
+    private final String designiteDir;
+    private final String sonarQubeServerBaseUrl;
+    private final String sonarQubeScannerBinDir;
+    private final String resultsDir;
+    private List<ProcessResult> resultList;
+
     public Process() {
+        Configuration conf = Configuration.getInstance();
+        repoDir = conf.getRepoDir();
+        branchName = conf.getRefactoringMinerBranchToAnalyze();
+        refactoringMinerDetectBetweenCommits = conf.isRefactoringMinerDetectBetweenCommits();
+        refactoringMinerStartCommitId = conf.getRefactoringMinerStartCommitId();
+        refactoringMinerEndCommitId = conf.getRefactoringMinerEndCommitId();
+        writeRefactoringMinerOutputOnFile = conf.isWriteRefactoringMinerOutputOnFile();
+        designiteDir = conf.getDesigniteDir();
+        sonarQubeServerBaseUrl = conf.getSonarQubeServerBaseUrl();
+        sonarQubeScannerBinDir = conf.getSonarQubeScannerBinDir();
+        resultsDir = conf.getResultsDir();
+
+        resultList = new ArrayList<>();
+        CSVService.writeCsvFileWithStrategy(
+                Utils.preparePathOsBased(false, resultsDir, RESULTS_PROCESS_FILENAME),
+                resultList,
+                ProcessResult.class,
+                true,
+                false);
     }
 
     public void start() throws Exception {
-
-        // region Load Configurations
-        Configuration conf = Configuration.getInstance();
-        String repoDir = conf.getRepoDir();
-        String branchName = conf.getRefactoringMinerBranchToAnalyze();
-        boolean refactoringMinerDetectBetweenCommits = conf.isRefactoringMinerDetectBetweenCommits();
-        String refactoringMinerStartCommitId = conf.getRefactoringMinerStartCommitId();
-        String refactoringMinerEndCommitId = conf.getRefactoringMinerEndCommitId();
-        boolean writeRefactoringMinerOutputOnFile = conf.isWriteRefactoringMinerOutputOnFile();
-        String designiteDir = conf.getDesigniteDir();
-        String sonarQubeServerBaseUrl = conf.getSonarQubeServerBaseUrl();
-        String sonarQubeScannerBinDir = conf.getSonarQubeScannerBinDir();
-        String resultsDir = conf.getResultsDir();
-        // endregion
-
-        List<ProcessResult> resultList = new ArrayList<>();
 
         RefactoringMinerWorker refactoringMinerWorker =
                 new RefactoringMinerWorker(repoDir, resultsDir, writeRefactoringMinerOutputOnFile);
@@ -125,15 +139,15 @@ public class Process {
                 }
             }
             logger.info("-----------------------------------------");
+            if (commitNumber % 5 == 0) {
+                logger.info("Updating " + RESULTS_PROCESS_FILENAME);
+                CSVService.writeCsvFileWithStrategy(Utils.preparePathOsBased(false, resultsDir, RESULTS_PROCESS_FILENAME), resultList, ProcessResult.class,false, true);
+                resultList.clear();
+            }
         }
-        logger.info("Generating " + RESULTS_PROCESS_FILENAME);
-        CSVService.writeCsvFileWithStrategy(Utils.preparePathOsBased(false, resultsDir, RESULTS_PROCESS_FILENAME), resultList, ProcessResult.class);
+        logger.info("Updating " + RESULTS_PROCESS_FILENAME);
+        CSVService.writeCsvFileWithStrategy(Utils.preparePathOsBased(false, resultsDir, RESULTS_PROCESS_FILENAME), resultList, ProcessResult.class, false, true);
         logger.info("Process finished!");
-    }
-
-    public static boolean isAdmissibleRefactoringType(RefactoringType refType, String codeSmell) {
-        Map<RefactoringType, Boolean> ref = Utils.allowedSmellWithRefactoringTypes.get(codeSmell);
-        return ref.containsKey(refType);
     }
 
     public static boolean isSamePathClass(String refClassFilePath, String smellClassFilePath) {

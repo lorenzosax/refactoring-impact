@@ -75,14 +75,19 @@ public class SonarQubeWorker {
 
 	public void executeScanning(String commitHashId) {
 		logger.info("Run Sonar Scanner...");
+		String sonarScannerScriptFilename = "sonar-scanner" + (Utils.isWindowsSystem ? ".bat" : "");
 		generatePropertiesFile(commitHashId);
-		new ProcBuilder("cmd")
-				.withWorkingDirectory(new File(this.repoDir))
-				.withArg("/c")
-				.withArg(Utils.preparePathOsBased(false, this.sonarScannerDir, "sonar-scanner.bat"))
+
+		ProcBuilder procBuilder = new ProcBuilder(Utils.currentShell);
+		procBuilder.withWorkingDirectory(new File(this.repoDir));
+		if (Utils.isWindowsSystem) {
+			procBuilder.withArg("/c");
+		}
+		procBuilder
+				.withArg(Utils.preparePathOsBased(false, this.sonarScannerDir, sonarScannerScriptFilename))
 				.withNoTimeout()
 				.run();
-		logger.info("Sona Scanner Done!");
+		logger.info("Sonar Scanner Done!");
 	}
 
 	public Integer extractTdFromComponent(Analysis analysis, String classPath) {

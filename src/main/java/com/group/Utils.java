@@ -10,27 +10,26 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-    private static boolean isWindowsSystem = Configuration.getInstance().isWindowsSystem();
+    public static final boolean isWindowsSystem = Configuration.getInstance().isWindowsSystem();
+    public static final String currentShell = Configuration.getInstance().getCurrentShell();
 
-    public static final Map<String, Map<RefactoringType, Boolean>> allowedSmellWithRefactoringTypes = new HashMap<String, Map<RefactoringType, Boolean>>() {{
-        put("Long Method", new HashMap<RefactoringType, Boolean>() {{
-            put(RefactoringType.EXTRACT_OPERATION, true);
-        }});
-        put("Long Parameter List", new HashMap<RefactoringType, Boolean>() {{
-            put(RefactoringType.EXTRACT_CLASS, true);
-            put(RefactoringType.MERGE_PARAMETER, true);
-            put(RefactoringType.REMOVE_PARAMETER, true);
-        }});
-        put("Insufficient Modularization", new HashMap<RefactoringType, Boolean>() {{
-            put(RefactoringType.EXTRACT_CLASS, true);
-            put(RefactoringType.EXTRACT_SUBCLASS, true);
-            put(RefactoringType.EXTRACT_INTERFACE, true);
-        }});
-        put("Multifaceted Abstraction", new HashMap<RefactoringType, Boolean>() {{
-            put(RefactoringType.EXTRACT_CLASS, true);
-            put(RefactoringType.EXTRACT_SUBCLASS, true);
-            put(RefactoringType.EXTRACT_INTERFACE, true);
-        }});
+    public static final Map<String, Boolean> allowedSmell = new HashMap<String, Boolean>() {{
+        put("Long Method", true);
+        put("Long Parameter List", true);
+        put("Insufficient Modularization", true);
+        put("Multifaceted Abstraction", true);
+        put("Imperative Abstraction", true);
+        put("Unnecessary Abstraction", true);
+        put("Unutilized Abstraction", true);
+        put("Deficient Encapsulation", true);
+        put("Unexploited Encapsulation", true);
+        put("Broken Modularization", true);
+        put("Hub-like Modularization", true);
+        put("Broken Hierarchy", true);
+        put("Deep Hierarchy", true);
+        put("Complex Method", true);
+        put("Rebellious Hierarchy", true);
+        put("Wide Hierarchy", true);
     }};
 
     public static final Map<RefactoringType, Boolean> refactoringsConsidered = new HashMap<RefactoringType, Boolean>() {{
