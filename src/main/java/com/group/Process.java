@@ -183,7 +183,7 @@ public class Process {
      * @return true if the path are equals
      */
     private static boolean isSamePathClass(String refClassFilePath, String smellClassFilePath) {
-        return refClassFilePath.equals(smellClassFilePath);
+        return refClassFilePath != null && refClassFilePath.equals(smellClassFilePath);
     }
 
     /**
@@ -194,6 +194,8 @@ public class Process {
      * @return a boolean value
      */
     private static boolean isSameMethod(String refMethodName, String smellMethodName) {
+        if (refMethodName == null) return false;
+
         StringTokenizer st = new StringTokenizer(refMethodName, "(");
         String method = st.nextToken();
 
