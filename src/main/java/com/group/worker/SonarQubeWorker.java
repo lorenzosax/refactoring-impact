@@ -33,6 +33,13 @@ public class SonarQubeWorker {
 	private String repoDir;
 	private String project;
 
+	/**
+	 * Start SonarQube worker for scanning repository checkout to analyze
+	 *
+	 * @param  sonarQubeServerBaseUrl  SonarQube Server base url
+	 * @param  sonarScannerDir absolute path of the directory that contains bins of SonarQube Scanner
+	 * @param  repoDir absolute path of the directory that contains the repository to be analyzed
+	 */
 	public SonarQubeWorker(String sonarQubeServerBaseUrl, String sonarScannerDir, String repoDir) {
 		this.baseUrl = sonarQubeServerBaseUrl;
 		this.sonarScannerDir = sonarScannerDir;
@@ -40,23 +47,39 @@ public class SonarQubeWorker {
 		this.project = Utils.getProjectNameFromRepoDir(this.repoDir);
 	}
 
+	/**
+	 * Start SonarQube worker for scanning repository checkout to analyze
+	 *
+	 * @param  commitHash  checkout commit to analyze
+	 * @throws  IOException
+	 * @return  a analysis object for specific commit
+	 */
 	public Analysis getAnalysisFor(String commitHash) throws IOException {
-
+		// concat project name with relative hash
 		String projectSonar = this.project.concat("_").concat(commitHash);
 
 		return new Gson().fromJson(Objects.requireNonNull(httpGetRequest(projectSonar)).toString(), Analysis.class);
 
 	}
 
+	/**
+	 * Building a GET request for get Sonar Scanner analysis from Sonar Server
+	 *
+	 * @param  projectSonar  project name
+	 * @throws  IOException
+	 * @return  a buffer that contains HTTP response
+	 */
 	private StringBuffer httpGetRequest(String projectSonar) throws IOException {
+		// URL for SonarQube server
 		URL obj = new URL(this.baseUrl + COMPONENT_TREE_API + projectSonar + PARAMETERS);
+		// HTTP message composition
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		int responseCode = con.getResponseCode();
 		logger.info("GET Response Code :: " + responseCode + " for " + projectSonar);
 
-		if (responseCode == HttpURLConnection.HTTP_OK) { // success
+		if (responseCode == HttpURLConnection.HTTP_OK) { // success HTTP request
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String inputLine;
 			StringBuffer response = new StringBuffer();
@@ -72,12 +95,18 @@ public class SonarQubeWorker {
 		}
 		return null;
 	}
-
-	public void executeScanning(String commitHashId) {
+	/**
+	 * Scanning a repository checkout throught Sonar Scanner
+	 *
+	 * @param  commitHash  checkout commit to analyze
+	 */
+	public void executeScanning(String commitHash) {
 		logger.info("Run Sonar Scanner...");
+		//variable path to the Sonar scanner depending on the operating system
 		String sonarScannerScriptFilename = "sonar-scanner" + (Utils.isWindowsSystem ? ".bat" : "");
-		generatePropertiesFile(commitHashId);
+		generatePropertiesFile(commitHash);
 
+			// throw command for Sonar scanner
 		ProcBuilder procBuilder = new ProcBuilder(Utils.currentShell);
 		procBuilder.withWorkingDirectory(new File(this.repoDir));
 		if (Utils.isWindowsSystem) {
@@ -90,6 +119,13 @@ public class SonarQubeWorker {
 		logger.info("Sonar Scanner Done!");
 	}
 
+	/**
+	 * Scanning a repository checkout throught Sonar Scanner
+	 *
+	 * @param  analysis  analysis object that contains TD value for specified class
+	 * @param  classPath class path for extract TD value for the specified class
+	 * @return TD value for specified class
+	 */
 	public Integer extractTdFromComponent(Analysis analysis, String classPath) {
 		if (analysis != null) {
 			for (Component c : analysis.getComponents()) {
@@ -105,25 +141,35 @@ public class SonarQubeWorker {
 		return 0;
 	}
 
-	private void generatePropertiesFile(String commitHashId) {
+	/**
+	 * Generate properties file in order to scanning a repository checkout
+	 *
+	 * @param  commitHash  checkout commit to analyze
+	 */
+	private void generatePropertiesFile(String commitHash) {
 
 		try {
 			BufferedWriter writer = new BufferedWriter(
 					new FileWriter(Utils.preparePathOsBased(false, this.repoDir, "sonar-project.properties"), false));
+			// project key for sonar (name project + commitHash)
 			writer.append("sonar.projectKey=");
 			writer.append(this.project);
 			writer.append("_");
-			writer.append(commitHashId);
+			writer.append(commitHash);
 			writer.append("\n");
+			// project name for sonar (name project + commitHash)
 			writer.append("sonar.projectName=");
 			writer.append(this.project);
 			writer.append("_");
-			writer.append(commitHashId);
+			writer.append(commitHash);
 			writer.append("\n");
+			// project sources directory
 			writer.append("sonar.sources=src");
 			writer.append("\n");
+			// project binary directory
 			writer.append("sonar.java.binaries=.");
 			writer.append("\n");
+			// disable SCM
 			writer.append("sonar.scm.disabled=true");
 
 			writer.close();
