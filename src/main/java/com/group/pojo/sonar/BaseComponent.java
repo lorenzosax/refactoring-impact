@@ -48,6 +48,5 @@ public class BaseComponent {
 	public void setMeasures(ArrayList<Measure> measures) {
 		this.measures = measures;
 	}
-	
-	
+
 }

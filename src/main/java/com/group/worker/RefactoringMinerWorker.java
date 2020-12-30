@@ -24,11 +24,11 @@ public class RefactoringMinerWorker {
     private static final Logger logger = Logger.getLogger(RefactoringMinerWorker.class);
     private static final String REFACTORING_TYPE_FOUND_FILENAME = "refactoringFound.csv";
 
-    private GitService gitService = new GitServiceImpl();
-    private GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
-    private Repository repo;
-    private String resultsDir;
-    private boolean writeOutputOnFile;
+    private final GitService gitService = new GitServiceImpl();
+    private final GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+    private final Repository repo;
+    private final String resultsDir;
+    private final boolean writeOutputOnFile;
 
     public RefactoringMinerWorker(String repoDir, String resultsDir, boolean writeOutputOnFile) throws Exception {
         repo = gitService.openRepository(repoDir);
@@ -161,7 +161,7 @@ public class RefactoringMinerWorker {
             }
         }
         CSVService.writeCsvFile(
-                resultsDir + "\\" + REFACTORING_TYPE_FOUND_FILENAME,
+                Utils.preparePathOsBased(false, resultsDir, REFACTORING_TYPE_FOUND_FILENAME),
                 refactoringList,
                 Refactoring.class);
     }

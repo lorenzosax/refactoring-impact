@@ -12,7 +12,6 @@ public class Period {
 		this.bestValue=bestValue;
 	}
 	
-	
 	public int getIndex() {
 		return index;
 	}

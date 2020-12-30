@@ -30,6 +30,5 @@ public class Paging {
 	public void setTotal(int total) {
 		this.total = total;
 	}
-	
-	
+
 }

@@ -2,6 +2,9 @@ package com.group;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Main class to run process
+ */
 public class Main {
 
     private static final Logger logger = Logger.getLogger(Main.class);

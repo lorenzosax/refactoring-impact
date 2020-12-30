@@ -8,6 +8,7 @@ public class Configuration {
     private static final Configuration instance = new Configuration();
 
     private final String repoDir;
+    private final String relativeSrcPath;
     private final String refactoringMinerBranchToAnalyze;
     private final boolean refactoringMinerDetectBetweenCommits;
     private final String refactoringMinerStartCommitId;
@@ -19,10 +20,12 @@ public class Configuration {
     private final String resultsDir;
 
     private final boolean isWindowsSystem;
+    private final String currentShell;
 
     private Configuration() {
         Config conf = ConfigFactory.load();
         repoDir = conf.getString("repo.dir");
+        relativeSrcPath = conf.getString("repo.relative-src-path");
         refactoringMinerBranchToAnalyze = conf.getString("refactoring-miner.branch-to-analyze");
         refactoringMinerDetectBetweenCommits = conf.getBoolean("refactoring-miner.detect-between-commits");
         refactoringMinerStartCommitId = conf.getString("refactoring-miner.start-commit-id");
@@ -33,7 +36,8 @@ public class Configuration {
         sonarQubeScannerBinDir = conf.getString("sonarqube.scanner.bin-dir");
         resultsDir = conf.getString("results.dir");
 
-        this.isWindowsSystem = StringUtils.containsIgnoreCase(conf.getString("os.name"), "windows");
+        isWindowsSystem = StringUtils.containsIgnoreCase(conf.getString("os.name"), "windows");
+        currentShell = isWindowsSystem ? "cmd" : "bash";
     }
 
     public static Configuration getInstance() {
@@ -42,6 +46,10 @@ public class Configuration {
 
     public String getRepoDir() {
         return repoDir;
+    }
+
+    public String getRelativeSrcPath() {
+        return relativeSrcPath;
     }
 
     public String getRefactoringMinerBranchToAnalyze() {
@@ -82,5 +90,9 @@ public class Configuration {
 
     public boolean isWindowsSystem() {
         return isWindowsSystem;
+    }
+
+    public String getCurrentShell() {
+        return currentShell;
     }
 }

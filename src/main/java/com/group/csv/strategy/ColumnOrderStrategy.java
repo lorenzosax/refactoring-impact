@@ -10,12 +10,16 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import java.util.Arrays;
 
 import com.group.csv.annotation.CsvBindByNameOrder;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class HeaderColumnNameAndOrderMappingStrategy<T> extends HeaderColumnNameMappingStrategy<T> {
+public class ColumnOrderStrategy<T> extends HeaderColumnNameMappingStrategy<T> {
 
-    public HeaderColumnNameAndOrderMappingStrategy(Class<T> type) {
+    private final boolean columnName;
+
+    public ColumnOrderStrategy(Class<T> type, boolean columnName) {
         setType(type);
+        this.columnName = columnName;
     }
 
     @Override
@@ -27,6 +31,9 @@ public class HeaderColumnNameAndOrderMappingStrategy<T> extends HeaderColumnName
         if (numColumns == -1) {
             return header;
         }
+
+        if (!this.columnName)
+            return ArrayUtils.EMPTY_STRING_ARRAY;
 
         header = new String[numColumns];
 

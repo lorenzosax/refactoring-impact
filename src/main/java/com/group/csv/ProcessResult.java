@@ -3,31 +3,33 @@ package com.group.csv;
 import com.group.csv.annotation.CsvBindByNameOrder;
 import com.opencsv.bean.CsvBindByName;
 
-@CsvBindByNameOrder({"Commit","Committer Name","Committer Email","Class","Method","Refactoring Type","Smell Type","TD difference","TD Class","Smell Removed"})
+@CsvBindByNameOrder({"commit","committer_name","committer_email","class","method","refactoring_type","smell_type","td_difference","td_class","smell_removed_with_ref", "smell_removed_no_ref"})
 public class ProcessResult {
 
     public enum TD_CLASS { IMPROVED, STABLE, PEJORATIVE};
 
-    @CsvBindByName(column = "Commit")
+    @CsvBindByName(column = "commit")
     private String commitHash;
-    @CsvBindByName(column = "Committer Name")
+    @CsvBindByName(column = "committer_name")
     private String committerName;
-    @CsvBindByName(column = "Committer Email")
+    @CsvBindByName(column = "committer_email")
     private String committerEmail;
-    @CsvBindByName(column = "Class")
+    @CsvBindByName(column = "class")
     private String className;
-    @CsvBindByName(column = "Method")
+    @CsvBindByName(column = "method")
     private String methodName;
-    @CsvBindByName(column = "Refactoring Type")
+    @CsvBindByName(column = "refactoring_type")
     private String refactoringType;
-    @CsvBindByName(column = "Smell Type")
+    @CsvBindByName(column = "smell_type")
     private String smellType;
-    @CsvBindByName(column = "TD difference")
+    @CsvBindByName(column = "td_difference")
     private Integer tdDifference;
-    @CsvBindByName(column = "TD Class")
+    @CsvBindByName(column = "td_class")
     private TD_CLASS tdClass;
-    @CsvBindByName(column = "Smell Removed")
-    private boolean isSmellRemoved;
+    @CsvBindByName(column = "smell_removed_with_ref")
+    private boolean isSmellRemovedWithRefactoring;
+    @CsvBindByName(column = "smell_removed_no_ref")
+    private boolean isSmellRemovedWithoutRefactoring;
 
     public ProcessResult() {
         this.tdDifference = 0;
@@ -35,7 +37,8 @@ public class ProcessResult {
 
     public ProcessResult(String commitHash, String committerName, String committerEmail, String className,
                          String methodName, String refactoringType, String smellType, Integer tdDifference,
-                         TD_CLASS tdClass, boolean isSmellRemoved) {
+                         TD_CLASS tdClass, boolean isSmellRemovedWithRefactoring,
+                         boolean isSmellRemovedWithoutRefactoring) {
         this.commitHash = commitHash;
         this.committerName = committerName;
         this.committerEmail = committerEmail;
@@ -45,7 +48,8 @@ public class ProcessResult {
         this.smellType = smellType;
         this.tdDifference = tdDifference;
         this.tdClass = tdClass;
-        this.isSmellRemoved = isSmellRemoved;
+        this.isSmellRemovedWithRefactoring = isSmellRemovedWithRefactoring;
+        this.isSmellRemovedWithoutRefactoring = isSmellRemovedWithoutRefactoring;
     }
 
     public String getCommitHash() {
@@ -120,12 +124,20 @@ public class ProcessResult {
         this.tdClass = tdClass;
     }
 
-    public boolean isSmellRemoved() {
-        return isSmellRemoved;
+    public boolean isSmellRemovedWithRefactoring() {
+        return isSmellRemovedWithRefactoring;
     }
 
-    public void setSmellRemoved(boolean smellRemoved) {
-        isSmellRemoved = smellRemoved;
+    public void setSmellRemovedWithRefactoring(boolean smellRemovedWithRefactoring) {
+        isSmellRemovedWithRefactoring = smellRemovedWithRefactoring;
+    }
+
+    public boolean isSmellRemovedWithoutRefactoring() {
+        return isSmellRemovedWithoutRefactoring;
+    }
+
+    public void setSmellRemovedWithoutRefactoring(boolean smellRemovedWithoutRefactoring) {
+        isSmellRemovedWithoutRefactoring = smellRemovedWithoutRefactoring;
     }
 
     public static TD_CLASS getTdClassFor(Integer value) {

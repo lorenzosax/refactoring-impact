@@ -17,8 +17,7 @@ public class Measure {
 		this.periods = new ArrayList<Period>();
 		this.bestValue = bestValue;
 	}
-	
-	
+
 	public Measure(String metric, String value, ArrayList<Period> periods, boolean bestValue) {
 		this.metric = metric;
 		this.value = value;

@@ -2,9 +2,10 @@ package com.group.csv;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.*;
-import com.group.csv.strategy.HeaderColumnNameAndOrderMappingStrategy;
+import com.group.csv.strategy.ColumnOrderStrategy;
 import org.apache.log4j.Logger;
 
+import java.io.FileWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -53,11 +54,11 @@ public class CSVService {
         return false;
     }
 
-    public static <T> boolean writeCsvFileWithStrategy(String filename, List<T> items, Class<T> clazz) {
+    public static <T> boolean writeCsvFileWithStrategy(String filename, List<T> items, Class<T> clazz, boolean header, boolean append) {
 
         try {
-            Writer writer = Files.newBufferedWriter(Paths.get(filename));
-            HeaderColumnNameAndOrderMappingStrategy<T> strategy = new HeaderColumnNameAndOrderMappingStrategy<>(clazz);
+            Writer writer = new FileWriter(filename, append);
+            ColumnOrderStrategy<T> strategy = new ColumnOrderStrategy<>(clazz, header);
             StatefulBeanToCsvBuilder<T> builder = new StatefulBeanToCsvBuilder(writer);
             StatefulBeanToCsv beanWriter = builder
                     .withMappingStrategy(strategy)
