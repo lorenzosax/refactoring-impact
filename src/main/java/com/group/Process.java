@@ -106,22 +106,23 @@ public class Process {
                     List<Smell> smellListActualCommit = designiteWorker.execute(commitHashId);
 
                     boolean sonarQubeScanningAlreadyDone = false;
-                    Integer tdDiff;
+                    Integer tdDiff = null;
                     Analysis actualAnalysis = null, previousAnalysis = null;
+                    ProcessResult pr;
 
                     // for each previous smell considerate all refactoring of current commit
                     for (Smell s0 : smellListPreviousCommit) {
+                        boolean refactoringsNotRemoveSmell = true;
                         for (Refactoring r : commit.getRefactoringList()) {
 
                             // Prepare new entry for results
-                            ProcessResult pr = new ProcessResult();
+                            pr = new ProcessResult();
                             pr.setCommitHash(commitHashId);
                             pr.setClassName(s0.getClassName());
                             pr.setMethodName(s0.getMethodName() == null ? "-" : s0.getMethodName());
                             pr.setCommitterName(infoCommit.getAuthor());
                             pr.setCommitterEmail(infoCommit.getEmail());
                             pr.setSmellType(s0.getCodeSmell());
-                            pr.setSmellRemoved(!smellListActualCommit.contains(s0));
                             pr.setRefactoringType(r.getRefactoringType().getDisplayName());
 
                             // to avoid throwing multiple times SonarQubeScanner check
@@ -149,13 +150,35 @@ public class Process {
                             // - actual smell list not contain previous smell
                             // - actual smell has same class path of the refactoring class path
                             // - actual smell hasn't method name OR have same method name with method under refactoring
-                            boolean isSmellRemoved = r.leftSide() != null && r.leftSide().size() > 0
+                            boolean isSmellRemovedWithRef = r.leftSide() != null && r.leftSide().size() > 0
                                     && !smellListActualCommit.contains(s0)
                                     && isSamePathClass(Utils.getPackagesWithClassPath(r.leftSide().get(0).getFilePath()), smellClassPath)
                                     && (s0.getMethodName() == null || isSameMethod(r.leftSide().get(0).getCodeElement(), s0.getMethodName()));
 
-                            pr.setSmellRemoved(isSmellRemoved);
+                            pr.setSmellRemovedWithRefactoring(isSmellRemovedWithRef);
 
+                            refactoringsNotRemoveSmell = refactoringsNotRemoveSmell && !isSmellRemovedWithRef;
+
+                            // in this loop we set always isSmellRemovedWithoutRefactoring to false,
+                            // if no refactorings resolve this smell this property will be set later
+                            pr.setSmellRemovedWithoutRefactoring(false);
+
+                            resultList.add(pr);
+                        }
+
+                        // if smell was not removed with refactorings but it was removed:
+                        if (refactoringsNotRemoveSmell && !smellListActualCommit.contains(s0)) {
+                            pr = new ProcessResult(commitHashId,
+                                    infoCommit.getAuthor(),
+                                    infoCommit.getEmail(),
+                                    s0.getClassName(),
+                                    s0.getMethodName() == null ? "-" : s0.getMethodName(),
+                                    "-",
+                                    s0.getCodeSmell(),
+                                    tdDiff,
+                                    ProcessResult.getTdClassFor(tdDiff),
+                                    false,
+                                    true);
                             resultList.add(pr);
                         }
                     }

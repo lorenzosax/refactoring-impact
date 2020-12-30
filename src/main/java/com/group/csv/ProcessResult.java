@@ -3,7 +3,7 @@ package com.group.csv;
 import com.group.csv.annotation.CsvBindByNameOrder;
 import com.opencsv.bean.CsvBindByName;
 
-@CsvBindByNameOrder({"commit","committer_name","committer_email","class","method","refactoring_type","smell_type","td_difference","td_class","smell_removed"})
+@CsvBindByNameOrder({"commit","committer_name","committer_email","class","method","refactoring_type","smell_type","td_difference","td_class","smell_removed_with_ref", "smell_removed_no_ref"})
 public class ProcessResult {
 
     public enum TD_CLASS { IMPROVED, STABLE, PEJORATIVE};
@@ -26,8 +26,10 @@ public class ProcessResult {
     private Integer tdDifference;
     @CsvBindByName(column = "td_class")
     private TD_CLASS tdClass;
-    @CsvBindByName(column = "smell_removed")
-    private boolean isSmellRemoved;
+    @CsvBindByName(column = "smell_removed_with_ref")
+    private boolean isSmellRemovedWithRefactoring;
+    @CsvBindByName(column = "smell_removed_no_ref")
+    private boolean isSmellRemovedWithoutRefactoring;
 
     public ProcessResult() {
         this.tdDifference = 0;
@@ -35,7 +37,8 @@ public class ProcessResult {
 
     public ProcessResult(String commitHash, String committerName, String committerEmail, String className,
                          String methodName, String refactoringType, String smellType, Integer tdDifference,
-                         TD_CLASS tdClass, boolean isSmellRemoved) {
+                         TD_CLASS tdClass, boolean isSmellRemovedWithRefactoring,
+                         boolean isSmellRemovedWithoutRefactoring) {
         this.commitHash = commitHash;
         this.committerName = committerName;
         this.committerEmail = committerEmail;
@@ -45,7 +48,8 @@ public class ProcessResult {
         this.smellType = smellType;
         this.tdDifference = tdDifference;
         this.tdClass = tdClass;
-        this.isSmellRemoved = isSmellRemoved;
+        this.isSmellRemovedWithRefactoring = isSmellRemovedWithRefactoring;
+        this.isSmellRemovedWithoutRefactoring = isSmellRemovedWithoutRefactoring;
     }
 
     public String getCommitHash() {
@@ -120,12 +124,20 @@ public class ProcessResult {
         this.tdClass = tdClass;
     }
 
-    public boolean isSmellRemoved() {
-        return isSmellRemoved;
+    public boolean isSmellRemovedWithRefactoring() {
+        return isSmellRemovedWithRefactoring;
     }
 
-    public void setSmellRemoved(boolean smellRemoved) {
-        isSmellRemoved = smellRemoved;
+    public void setSmellRemovedWithRefactoring(boolean smellRemovedWithRefactoring) {
+        isSmellRemovedWithRefactoring = smellRemovedWithRefactoring;
+    }
+
+    public boolean isSmellRemovedWithoutRefactoring() {
+        return isSmellRemovedWithoutRefactoring;
+    }
+
+    public void setSmellRemovedWithoutRefactoring(boolean smellRemovedWithoutRefactoring) {
+        isSmellRemovedWithoutRefactoring = smellRemovedWithoutRefactoring;
     }
 
     public static TD_CLASS getTdClassFor(Integer value) {

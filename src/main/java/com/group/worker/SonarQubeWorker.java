@@ -70,14 +70,16 @@ public class SonarQubeWorker {
 	 * @return  a buffer that contains HTTP response
 	 */
 	private StringBuffer httpGetRequest(String projectSonar) throws IOException {
+		String requestUrl = this.baseUrl + COMPONENT_TREE_API + projectSonar + PARAMETERS;
+		logger.info("GET request: " + requestUrl);
 		// URL for SonarQube server
-		URL obj = new URL(this.baseUrl + COMPONENT_TREE_API + projectSonar + PARAMETERS);
+		URL obj = new URL(requestUrl);
 		// HTTP message composition
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		int responseCode = con.getResponseCode();
-		logger.info("GET Response Code :: " + responseCode + " for " + projectSonar);
+		logger.info("GET Response Code : " + responseCode + " for " + projectSonar);
 
 		if (responseCode == HttpURLConnection.HTTP_OK) { // success HTTP request
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
