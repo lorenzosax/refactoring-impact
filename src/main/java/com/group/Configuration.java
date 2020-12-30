@@ -8,6 +8,7 @@ public class Configuration {
     private static final Configuration instance = new Configuration();
 
     private final String repoDir;
+    private final String relativeSrcPath;
     private final String refactoringMinerBranchToAnalyze;
     private final boolean refactoringMinerDetectBetweenCommits;
     private final String refactoringMinerStartCommitId;
@@ -24,6 +25,7 @@ public class Configuration {
     private Configuration() {
         Config conf = ConfigFactory.load();
         repoDir = conf.getString("repo.dir");
+        relativeSrcPath = conf.getString("repo.relative-src-path");
         refactoringMinerBranchToAnalyze = conf.getString("refactoring-miner.branch-to-analyze");
         refactoringMinerDetectBetweenCommits = conf.getBoolean("refactoring-miner.detect-between-commits");
         refactoringMinerStartCommitId = conf.getString("refactoring-miner.start-commit-id");
@@ -44,6 +46,10 @@ public class Configuration {
 
     public String getRepoDir() {
         return repoDir;
+    }
+
+    public String getRelativeSrcPath() {
+        return relativeSrcPath;
     }
 
     public String getRefactoringMinerBranchToAnalyze() {

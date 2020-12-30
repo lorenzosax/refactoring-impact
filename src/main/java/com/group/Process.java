@@ -23,6 +23,7 @@ public class Process {
     static final String RESULTS_PROCESS_FILENAME = "datasets.csv";
 
     private final String repoDir;
+    private final String relativeSrcPath;
     private final String branchName;
     private final boolean refactoringMinerDetectBetweenCommits;
     private final String refactoringMinerStartCommitId;
@@ -37,6 +38,7 @@ public class Process {
     public Process() {
         Configuration conf = Configuration.getInstance();
         repoDir = conf.getRepoDir();
+        relativeSrcPath = conf.getRelativeSrcPath();
         branchName = conf.getRefactoringMinerBranchToAnalyze();
         refactoringMinerDetectBetweenCommits = conf.isRefactoringMinerDetectBetweenCommits();
         refactoringMinerStartCommitId = conf.getRefactoringMinerStartCommitId();
@@ -68,7 +70,8 @@ public class Process {
         RefactoringMinerWorker refactoringMinerWorker =
                 new RefactoringMinerWorker(repoDir, resultsDir, writeRefactoringMinerOutputOnFile);
         DesigniteWorker designiteWorker = new DesigniteWorker(designiteDir, repoDir, resultsDir);
-        SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeServerBaseUrl, sonarQubeScannerBinDir,repoDir);
+        SonarQubeWorker sonarQubeWorker = new SonarQubeWorker(sonarQubeServerBaseUrl, sonarQubeScannerBinDir,
+                repoDir, relativeSrcPath);
 
         logger.info("<Start process>");
 

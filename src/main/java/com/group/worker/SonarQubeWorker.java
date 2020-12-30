@@ -31,6 +31,7 @@ public class SonarQubeWorker {
 	private String baseUrl;
 	private String sonarScannerDir;
 	private String repoDir;
+	private String relativeSrcPath;
 	private String project;
 
 	/**
@@ -40,10 +41,11 @@ public class SonarQubeWorker {
 	 * @param  sonarScannerDir absolute path of the directory that contains bins of SonarQube Scanner
 	 * @param  repoDir absolute path of the directory that contains the repository to be analyzed
 	 */
-	public SonarQubeWorker(String sonarQubeServerBaseUrl, String sonarScannerDir, String repoDir) {
+	public SonarQubeWorker(String sonarQubeServerBaseUrl, String sonarScannerDir, String repoDir, String relativeSrcPath) {
 		this.baseUrl = sonarQubeServerBaseUrl;
 		this.sonarScannerDir = sonarScannerDir;
 		this.repoDir = repoDir;
+		this.relativeSrcPath = relativeSrcPath;
 		this.project = Utils.getProjectNameFromRepoDir(this.repoDir);
 	}
 
@@ -166,7 +168,8 @@ public class SonarQubeWorker {
 			writer.append(commitHash);
 			writer.append("\n");
 			// project sources directory
-			writer.append("sonar.sources=src");
+			writer.append("sonar.sources=");
+			writer.append(this.relativeSrcPath);
 			writer.append("\n");
 			// project binary directory
 			writer.append("sonar.java.binaries=.");
