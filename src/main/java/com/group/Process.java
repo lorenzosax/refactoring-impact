@@ -211,7 +211,7 @@ public class Process {
                                 else
                                     pr.setSmellRemovedWithRefactoring(false);
 
-                                // obviously it has not been remove and so neither for other causes
+                                // regards refactorings and not other causes
                                 pr.setSmellRemovedWithoutRefactoring(false);
 
                                 resultList.add(pr);
