@@ -230,13 +230,17 @@ public class Process {
                             // obviously it was not refactoring
                             pr.setSmellRemovedWithRefactoring(false);
 
-                            sonarQubeWorker.executeScanning(commitHashId);
-                            refactoringMinerWorker.checkoutToCommit(previousCommitHashId);
-                            sonarQubeWorker.executeScanning(previousCommitHashId);
+                            // to avoid throwing multiple times SonarQubeScanner check
+                            // if already done for current and previous commit
+                            if (!sonarQubeScanningAlreadyDone) {
+                                sonarQubeWorker.executeScanning(commitHashId);
+                                refactoringMinerWorker.checkoutToCommit(previousCommitHashId);
+                                sonarQubeWorker.executeScanning(previousCommitHashId);
 
-                            actualAnalysis = sonarQubeWorker.getAnalysisFor(commitHashId);
-                            previousAnalysis = sonarQubeWorker.getAnalysisFor(previousCommitHashId);
-                            sonarQubeScanningAlreadyDone = true;
+                                actualAnalysis = sonarQubeWorker.getAnalysisFor(commitHashId);
+                                previousAnalysis = sonarQubeWorker.getAnalysisFor(previousCommitHashId);
+                                sonarQubeScanningAlreadyDone = true;
+                            }
 
                             tdDiff = sonarQubeWorker.extractTdFromComponent(previousAnalysis, smellClassPath)
                                     - sonarQubeWorker.extractTdFromComponent(actualAnalysis, smellClassPath);
