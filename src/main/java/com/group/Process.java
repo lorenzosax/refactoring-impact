@@ -227,6 +227,7 @@ public class Process {
                             pr.setCommitterName(infoCommit.getAuthor());
                             pr.setCommitterEmail(infoCommit.getEmail());
                             pr.setSmellType(s0.getCodeSmell());
+                            pr.setRefactoringType("-");
                             // obviously it was not refactoring
                             pr.setSmellRemovedWithRefactoring(false);
 
