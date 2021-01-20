@@ -18,7 +18,7 @@ git clone https://github.com/RaffaeleFranco/Refactoring-Impact
 Import project into IDE (e.g. Eclipse or Intellij) and download Gradle dependences.
 
 ### Configurations
-There are a file for configurations into `src/main/resources` where already exists a template called `application-template.conf`.
+There is a file for configurations into `src/main/resources` where already exists a template called `application-template.conf`.
 
 __A new configuration file can be created (by copying one of those already present)
  and renaming it as you want (e.g. `application.conf`).__
