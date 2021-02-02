@@ -1,4 +1,4 @@
-# Refactoring Impact [![Build Status](https://github.com/muesli/markscribe/workflows/build/badge.svg)](https://github.com/RaffaeleFranco/Refactoring-Impact/actions)
+# Refactoring Impact
 This repository contains source code of a toolchain developed for a Unisannio exam for the analysis of refactoring on code smells and influence on technical debt in Java software repositories.
 The objective of the study is to evaluate the impact of refactoring on code smells and calculate the technical debt by analyzing various open source systems written in Java.
 In particular, for each code smell removed, the technical debt relating to the smell before and after the refactoring is considered, in order to calculate the difference and establish whether the technical debt is improved, pejorative or stable.
@@ -13,7 +13,7 @@ In particular, for each code smell removed, the technical debt relating to the s
 ### Getting Started
 Clone the project:
 ```
-git clone https://github.com/RaffaeleFranco/Refactoring-Impact
+git clone https://github.com/lorenzosax/refactoring-impact
 ```
 Import project into IDE (e.g. Eclipse or Intellij) and download Gradle dependences.
 
@@ -21,5 +21,5 @@ Import project into IDE (e.g. Eclipse or Intellij) and download Gradle dependenc
 There is a file for configurations into `src/main/resources` where already exists a template called `application-template.conf`.
 
 __A new configuration file can be created (by copying one of those already present)
- and renaming it as you want (e.g. `application.conf`).__
+ and renaming it as `application.conf`).__
  
