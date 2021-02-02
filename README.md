@@ -1,4 +1,4 @@
-# Refactoring Impact
+# Refactoring Impact [![Build Status](https://github.com/muesli/markscribe/workflows/build/badge.svg)](https://github.com/lorenzosax/refactoring-impact/actions)
 This repository contains source code of a toolchain developed for a Unisannio exam for the analysis of refactoring on code smells and influence on technical debt in Java software repositories.
 The objective of the study is to evaluate the impact of refactoring on code smells and calculate the technical debt by analyzing various open source systems written in Java.
 In particular, for each code smell removed, the technical debt relating to the smell before and after the refactoring is considered, in order to calculate the difference and establish whether the technical debt is improved, pejorative or stable.
